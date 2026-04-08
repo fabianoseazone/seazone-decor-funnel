@@ -23,8 +23,8 @@ import openpyxl
 import csv
 from pathlib import Path
 
-SUPABASE_URL = "https://qnkhsgbqnnjkbehxxdny.supabase.co"
-SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFua2hzZ2Jxbm5qa2JlaHh4ZG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzOTQ1ODgsImV4cCI6MjA4NTk3MDU4OH0.aY6azaem5UP2W5281oiT2HrVoQno2d3v4kWFo2eaYCY"
+SUPABASE_URL = "https://cukvbchfroyaxcalakdj.supabase.co"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1a3ZiY2hmcm95YXhjYWxha2RqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2ODYyNzcsImV4cCI6MjA5MTI2MjI3N30.EdkVuff4VoLZCz-3oqN02s67smaFmnxGBDDx8J48VcA"
 DOWNLOADS = Path("C:/Users/Fabiano/Downloads")
 
 HEADERS = {
@@ -37,11 +37,24 @@ HEADERS = {
 PACOTE_ABREV_TO_CODE = {"ES": 1, "PL": 2, "PR": 3, "HD1": 4, "AM": 5}
 
 
+def deduplicate(rows: list[dict]) -> list[dict]:
+    """Remove duplicate rows by 'codigo' field, keeping last occurrence."""
+    seen: dict = {}
+    for r in rows:
+        key = r.get("codigo")
+        if key is not None:
+            seen[key] = r
+        else:
+            seen[id(r)] = r
+    return list(seen.values())
+
+
 def upsert(table: str, rows: list[dict]) -> None:
     if not rows:
         print(f"  [skip] {table}: no rows")
         return
-    batch_size = 500
+    rows = deduplicate(rows)
+    batch_size = 200
     total = 0
     for i in range(0, len(rows), batch_size):
         batch = rows[i:i + batch_size]
@@ -183,21 +196,40 @@ def seed_tipologias():
     upsert("tipologia", rows)
 
 
+def get_valid_tipologia_codigos() -> set:
+    """Query Supabase for all valid tipologia codes."""
+    resp = requests.get(
+        f"{SUPABASE_URL}/rest/v1/tipologia?select=codigo",
+        headers={**HEADERS, "Prefer": ""},
+    )
+    if resp.status_code != 200:
+        return set()
+    return {r["codigo"] for r in resp.json()}
+
+
 def seed_apartamentos():
     print("Seeding apartamentos...")
+    valid_tipologias = get_valid_tipologia_codigos()
     path = DOWNLOADS / "Tipologia Apto.xlsx"
     headers, data = read_xlsx(path)
     col = {h: i for i, h in enumerate(headers)}
     rows = []
+    skipped = 0
     for r in data:
         if not r[col.get("codigo", 0)]:
             continue
+        tip_code = to_int(r[col.get("tipologiaCodigo", -1)])
+        if tip_code and tip_code not in valid_tipologias:
+            tip_code = None
+            skipped += 1
         rows.append({
             "codigo":                to_int(r[col["codigo"]]),
             "empreendimento_codigo": to_int(r[col.get("empreendimentoCodigo", -1)]),
             "apartamento_id":        str(r[col.get("apartamentoId", -1)] or "").strip(),
-            "tipologia_codigo":      to_int(r[col.get("tipologiaCodigo", -1)]),
+            "tipologia_codigo":      tip_code,
         })
+    if skipped:
+        print(f"  [warn] {skipped} apartamentos com tipologia_codigo invalido -> definido como NULL")
     upsert("apartamento", rows)
 
 
