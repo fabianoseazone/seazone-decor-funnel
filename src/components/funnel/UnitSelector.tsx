@@ -1,38 +1,46 @@
 import { useState } from "react";
-import { MapPin, Calendar, ChevronDown, Check } from "lucide-react";
+import { MapPin, Building2, Check, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
-import { mockUnits, mockSpots } from "@/data/mockData";
+import { useEmpreendimentos } from "@/hooks/useEmpreendimentos";
+import { useApartamentos } from "@/hooks/useApartamentos";
 import { useFunnel } from "@/contexts/FunnelContext";
-import { Unit } from "@/types/funnel";
+import type { Unit } from "@/types/funnel";
 
 interface UnitSelectorProps {
   onComplete: () => void;
 }
 
 export function UnitSelector({ onComplete }: UnitSelectorProps) {
-  const { selectUnit, selectedUnit } = useFunnel();
-  const [selectedSpot, setSelectedSpot] = useState<string>("");
-  const [selectedUnitId, setSelectedUnitId] = useState<string>("");
+  const { selectUnit } = useFunnel();
+  const [selectedEmpCodigo, setSelectedEmpCodigo] = useState<number | null>(null);
+  const [selectedAptoCodigo, setSelectedAptoCodigo] = useState<number | null>(null);
 
-  const filteredUnits = selectedSpot 
-    ? mockUnits.filter(u => u.spot === selectedSpot)
-    : mockUnits;
+  const { data: empreendimentos, isLoading: loadingEmps } = useEmpreendimentos();
+  const { data: apartamentos, isLoading: loadingAptos } = useApartamentos(selectedEmpCodigo);
+
+  const selectedEmp = empreendimentos?.find(e => e.codigo === selectedEmpCodigo);
+  const selectedApto = apartamentos?.find(a => a.codigo === selectedAptoCodigo);
 
   const handleConfirm = () => {
-    const unit = mockUnits.find(u => u.id === selectedUnitId);
-    if (unit) {
-      selectUnit(unit);
-      onComplete();
-    }
+    if (!selectedApto || !selectedEmp) return;
+    const unit: Unit = {
+      id: selectedApto.apartamento_id,
+      spot: selectedEmp.descricao,
+      deliveryDate: new Date(),
+      tipologiaCodigo: selectedApto.tipologia_codigo,
+      empreendimentoCodigo: selectedApto.empreendimento_codigo,
+    };
+    selectUnit(unit);
+    onComplete();
   };
 
   return (
@@ -51,68 +59,72 @@ export function UnitSelector({ onComplete }: UnitSelectorProps) {
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {/* Spot Selection */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground flex items-center gap-2">
               <MapPin className="w-4 h-4 text-seazone-coral" />
-              Empreendimento (Spot)
+              Empreendimento
             </label>
-            <Select value={selectedSpot} onValueChange={setSelectedSpot}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Selecione o empreendimento" />
-              </SelectTrigger>
-              <SelectContent>
-                {mockSpots.map((spot) => (
-                  <SelectItem key={spot} value={spot}>
-                    {spot}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Unit Selection */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-seazone-coral" />
-              Unidade
-            </label>
-            <Select 
-              value={selectedUnitId} 
-              onValueChange={setSelectedUnitId}
-              disabled={!selectedSpot}
+            <Select
+              value={selectedEmpCodigo?.toString() ?? ""}
+              onValueChange={(v) => {
+                setSelectedEmpCodigo(Number(v));
+                setSelectedAptoCodigo(null);
+              }}
+              disabled={loadingEmps}
             >
               <SelectTrigger className="w-full">
-                <SelectValue placeholder={selectedSpot ? "Selecione a unidade" : "Primeiro selecione o empreendimento"} />
+                <SelectValue placeholder={
+                  loadingEmps ? "Carregando..." : "Selecione o empreendimento"
+                } />
               </SelectTrigger>
               <SelectContent>
-                {filteredUnits.map((unit) => (
-                  <SelectItem key={unit.id} value={unit.id}>
-                    <div className="flex items-center justify-between w-full">
-                      <span>{unit.id} - {unit.spot}</span>
-                      <span className="text-xs text-muted-foreground ml-4">
-                        Entrega: {unit.deliveryDate.toLocaleDateString("pt-BR")}
-                      </span>
-                    </div>
+                {empreendimentos?.map((emp) => (
+                  <SelectItem key={emp.codigo} value={emp.codigo.toString()}>
+                    {emp.descricao}{emp.cidade ? ` — ${emp.cidade}` : ""}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          {/* Selected Unit Preview */}
-          {selectedUnitId && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-seazone-coral" />
+              Unidade
+            </label>
+            <Select
+              value={selectedAptoCodigo?.toString() ?? ""}
+              onValueChange={(v) => setSelectedAptoCodigo(Number(v))}
+              disabled={!selectedEmpCodigo || loadingAptos}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder={
+                  !selectedEmpCodigo
+                    ? "Primeiro selecione o empreendimento"
+                    : loadingAptos
+                    ? "Carregando unidades..."
+                    : "Selecione a unidade"
+                } />
+              </SelectTrigger>
+              <SelectContent>
+                {apartamentos?.map((apto) => (
+                  <SelectItem key={apto.codigo} value={apto.codigo.toString()}>
+                    {apto.apartamento_id}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {selectedApto && selectedEmp && (
             <Card variant="elevated" className="bg-seazone-success/10 border-seazone-success/30">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <Check className="w-5 h-5 text-seazone-success" />
                   <div>
-                    <p className="font-medium text-foreground">
-                      {filteredUnits.find(u => u.id === selectedUnitId)?.spot}
-                    </p>
+                    <p className="font-medium text-foreground">{selectedEmp.descricao}</p>
                     <p className="text-sm text-muted-foreground">
-                      Unidade {selectedUnitId} • Entrega em{" "}
-                      {filteredUnits.find(u => u.id === selectedUnitId)?.deliveryDate.toLocaleDateString("pt-BR")}
+                      Unidade {selectedApto.apartamento_id}
                     </p>
                   </div>
                 </div>
@@ -120,14 +132,18 @@ export function UnitSelector({ onComplete }: UnitSelectorProps) {
             </Card>
           )}
 
-          <Button 
-            variant="coral" 
-            size="lg" 
+          <Button
+            variant="coral"
+            size="lg"
             className="w-full"
-            disabled={!selectedUnitId}
+            disabled={!selectedAptoCodigo}
             onClick={handleConfirm}
           >
-            Iniciar Configuração
+            {loadingAptos ? (
+              <><Loader2 className="w-4 h-4 animate-spin mr-2" />Carregando...</>
+            ) : (
+              "Iniciar Configuração"
+            )}
           </Button>
         </CardContent>
       </Card>
