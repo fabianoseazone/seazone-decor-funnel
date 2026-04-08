@@ -14,6 +14,115 @@ export type Database = {
   }
   public: {
     Tables: {
+      empreendimento: {
+        Row: {
+          id: number
+          codigo: number
+          descricao: string
+          cidade: string | null
+          estado: string | null
+          endereco: string | null
+          cep: string | null
+          quantidade_unidades: number | null
+          data_entrega: string | null
+          created_at: string
+        }
+        Insert: {
+          codigo: number
+          descricao: string
+          cidade?: string | null
+          estado?: string | null
+          endereco?: string | null
+          cep?: string | null
+          quantidade_unidades?: number | null
+          data_entrega?: string | null
+        }
+        Update: {
+          descricao?: string
+          cidade?: string | null
+          estado?: string | null
+        }
+        Relationships: []
+      }
+      pacote: {
+        Row: {
+          id: number
+          codigo: number
+          descricao: string
+          abreviacao: string
+          ativo: boolean
+        }
+        Insert: { codigo: number; descricao: string; abreviacao: string; ativo?: boolean }
+        Update: { descricao?: string; abreviacao?: string; ativo?: boolean }
+        Relationships: []
+      }
+      produto: {
+        Row: {
+          id: number
+          codigo: number
+          nome: string
+          descricao: string | null
+          categoria_codigo: string | null
+          subcategoria_codigo: string | null
+          valor: number | null
+          imagem_url: string | null
+          link: string | null
+          ativo: boolean
+        }
+        Insert: { codigo: number; nome: string; [key: string]: unknown }
+        Update: { nome?: string; valor?: number | null }
+        Relationships: []
+      }
+      tipologia: {
+        Row: {
+          id: number
+          codigo: number
+          empreendimento_codigo: number | null
+          descricao: string
+          tipo_letra: string | null
+          pacote_codigo: number | null
+          num_hospedes: number | null
+          decor_tipo: string | null
+          decor_valor: number | null
+          decor_percent: number | null
+          adm_tipo: string | null
+          adm_percent: number | null
+          adm_valor: number | null
+        }
+        Insert: { codigo: number; descricao: string; [key: string]: unknown }
+        Update: { tipo_letra?: string | null; pacote_codigo?: number | null }
+        Relationships: []
+      }
+      apartamento: {
+        Row: {
+          id: number
+          codigo: number
+          empreendimento_codigo: number | null
+          apartamento_id: string
+          tipologia_codigo: number | null
+          created_at: string
+        }
+        Insert: { codigo: number; apartamento_id: string; [key: string]: unknown }
+        Update: { tipologia_codigo?: number | null }
+        Relationships: []
+      }
+      produto_tipologia: {
+        Row: {
+          id: number
+          codigo: number | null
+          tipologia_codigo: number | null
+          produto_codigo: number | null
+          quantidade: number | null
+          categoria_codigo: string | null
+          subcategoria_codigo: string | null
+          valor_unitario: number | null
+          item_adicional: boolean | null
+          created_at: string
+        }
+        Insert: { tipologia_codigo: number; produto_codigo: number; [key: string]: unknown }
+        Update: { quantidade?: number; valor_unitario?: number | null }
+        Relationships: []
+      }
       simulator_leads: {
         Row: {
           created_at: string
