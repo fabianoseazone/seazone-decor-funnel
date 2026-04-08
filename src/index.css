@@ -1,0 +1,273 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Seazone Brand Colors */
+    --background: 220 25% 97%;
+    --foreground: 220 40% 13%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 40% 13%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 40% 13%;
+
+    --primary: 226 70.7317% 40.1961%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 20% 94%;
+    --secondary-foreground: 220 40% 13%;
+
+    --muted: 220 15% 92%;
+    --muted-foreground: 220 15% 45%;
+
+    --accent: 8 100% 68%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 15% 88%;
+    --input: 220 15% 88%;
+    --ring: 220 50% 15%;
+
+    --radius: 0.75rem;
+
+    /* Custom Seazone tokens */
+    --seazone-navy: 220 50% 12%;
+    --seazone-navy-light: 220 40% 20%;
+    --seazone-coral: 8 100% 68%;
+    --seazone-coral-light: 8 100% 75%;
+    --seazone-gold: 45 90% 55%;
+    --seazone-success: 160 70% 45%;
+    --seazone-blue-glow: 220 80% 60%;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 220 50% 8%;
+    --foreground: 220 10% 95%;
+
+    --card: 220 45% 12%;
+    --card-foreground: 220 10% 95%;
+
+    --popover: 220 45% 12%;
+    --popover-foreground: 220 10% 95%;
+
+    --primary: 0 0% 100%;
+    --primary-foreground: 220 50% 12%;
+
+    --secondary: 220 40% 18%;
+    --secondary-foreground: 220 10% 95%;
+
+    --muted: 220 40% 18%;
+    --muted-foreground: 220 15% 60%;
+
+    --accent: 8 100% 68%;
+    --accent-foreground: 0 0% 100%;
+
+    --border: 220 40% 20%;
+    --input: 220 40% 20%;
+    --ring: 8 100% 68%;
+
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3 {
+    font-family: 'Playfair Display', serif;
+  }
+}
+
+@layer components {
+  .text-gradient-coral {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(8 100% 68%) 0%, hsl(15 100% 60%) 100%);
+  }
+
+  .text-gradient-premium {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(45 90% 55%) 0%, hsl(35 95% 50%) 100%);
+  }
+
+  .bg-hero {
+    background: linear-gradient(135deg, hsl(220 50% 12%) 0%, hsl(220 40% 22%) 100%);
+  }
+
+  .bg-navy-gradient {
+    background: linear-gradient(135deg, hsl(220 50% 18%) 0%, hsl(225 60% 28%) 100%);
+  }
+
+  .bg-coral-gradient {
+    background: linear-gradient(135deg, hsl(8 100% 68%) 0%, hsl(15 100% 60%) 100%);
+  }
+
+  .bg-premium-gradient {
+    background: linear-gradient(135deg, hsl(45 90% 55%) 0%, hsl(35 95% 50%) 100%);
+  }
+
+  .shadow-card {
+    box-shadow: 0 8px 32px -8px hsl(220 50% 12% / 0.12);
+  }
+
+  .shadow-elevated {
+    box-shadow: 0 16px 48px -12px hsl(220 50% 12% / 0.18);
+  }
+
+  .shadow-coral {
+    box-shadow: 0 8px 24px -4px hsl(8 100% 68% / 0.35);
+  }
+
+  .shadow-glow {
+    box-shadow: 0 0 40px hsl(220 80% 60% / 0.15);
+  }
+
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-xl border border-white/20;
+    box-shadow: 0 8px 32px -8px hsl(220 50% 12% / 0.12);
+  }
+
+  .glass-dark {
+    @apply bg-primary/80 backdrop-blur-xl border border-white/10;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.6s ease-out forwards;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes drift {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.8;
+  }
+  25% {
+    transform: translate(2%, 1%) scale(1.02);
+  }
+  50% {
+    transform: translate(0, 2%) scale(1);
+    opacity: 1;
+  }
+  75% {
+    transform: translate(-2%, 1%) scale(0.98);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+@keyframes gradient-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-gradient-rotate {
+  animation: gradient-rotate 30s linear infinite;
+  transform-origin: center;
+  /* Scale up to cover corners during rotation */
+  width: 150%;
+  height: 150%;
+  top: -25%;
+  left: -25%;
+}
+
+.simulator-glow {
+  box-shadow:
+    0 0 30px hsl(8 100% 68% / 0.2),
+    0 0 60px hsl(45 90% 55% / 0.1),
+    0 20px 60px hsl(220 50% 12% / 0.4);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}

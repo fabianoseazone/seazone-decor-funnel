@@ -1,0 +1,60 @@
+MATRIZ DE RESULTADO - SIMULADOR SEAZONE DECOR,,,,,,
+,,,,,,
+=== SEÇÃO 1: PERGUNTAS ESTRATÉGICAS (Steps 1-3) ===,,,,,,
+Step,Pergunta,Opção A (Label),Opção A (Descrição),Pontos Opção A,Opção B (Label),Opção B (Descrição),Pontos Opção B
+1,Como você quer posicionar seu imóvel no mercado?,Competitivo e Eficiente,"Preço acessível, alta ocupação e retorno rápido.",0,Exclusivo e Diferenciado,"Ticket médio alto, avaliações 5 estrelas e destaque no mercado.",2
+2,Qual é a sua visão sobre o tempo de retorno?,Payback Acelerado,Investimento enxuto com retorno no menor prazo possível.,0,Valorização Contínua,Construir um ativo premium que se valoriza ao longo do tempo.,2
+3,Qual a durabilidade esperada do seu projeto?,Prático e Renovável,"Materiais funcionais, fáceis de repor e trocar.",0,Resistente e Atemporal,Materiais premium com acabamento durável e sofisticado.,2
+,,,,,,
+=== SEÇÃO 2: PERGUNTAS TÉCNICAS (Steps 4-10) ===,,,,,,
+Step,Pergunta,Opção A (Label),Opção A (Efeito no Preço),Pontos Opção A,Opção B (Label),Opção B (Efeito no Preço),Pontos Opção B
+4,Sua unidade é em um empreendimento Spot?,Não,+R$ 30.000,0,Sim,Sem acréscimo,0
+5,Qual o padrão de marcenaria e acabamento?,Funcional,-R$ 8.000,0,Premium,Sem desconto,+1
+6,Qual o padrão de eletrodomésticos?,Essenciais,-R$ 5.000,0,Gourmet,Sem desconto,+1
+7,Qual o padrão de infraestrutura?,Básica,-R$ 15.000,0,Completa,Sem desconto,0
+8,Kit de hotelaria e enxoval?,Próprio,-R$ 10.000,0,Kit Seazone,Sem desconto,+1
+9,Quantas unidades? (input numérico),1 unidade,Sem desconto,,2 unidades,Sem desconto,
+,,3 unidades,Sem desconto,,4 unidades,Sem desconto,
+,,5 unidades,-R$ 8.000/un,,6+ unidades,-R$ 14.000/un,
+10,O imóvel será operado pela Seazone?,Não,(sem impacto no preço),0,Sim,(sem impacto no preço),0
+,,,,,,
+=== SEÇÃO 3: SISTEMA DE PONTUAÇÃO ===,,,,,,
+Fonte de Pontos,Condição,Pontos,,,,
+Pergunta 1 - Posicionamento,Opção B (Exclusivo),+2,,,,
+Pergunta 2 - Retorno,Opção B (Valorização),+2,,,,
+Pergunta 3 - Durabilidade,Opção B (Resistente),+2,,,,
+Marcenaria,Premium,+1,,,,
+Eletrodomésticos,Gourmet,+1,,,,
+Hotelaria,Kit Seazone,+1,,,,
+PONTUAÇÃO MÁXIMA POSSÍVEL,,9,,,,
+,,,,,,
+=== SEÇÃO 4: FAIXAS DE RESULTADO ===,,,,,,
+Faixa de Pontuação,Padrão de Partida,Perfil do Investidor,Descrição do Perfil (Frase 1),Descrição do Perfil (Frase 2),,
+0 a 2,Essential,Investidor Estratégico,"Seu perfil indica foco em eficiência operacional e retorno acelerado, priorizando a funcionalidade do investimento.","Recomendamos o padrão Essential como ponto de partida — um equilíbrio inteligente entre custo e performance de locação.",,
+3 a 4,Plus,Investidor Estratégico,"Seu perfil indica foco em eficiência operacional e retorno acelerado, priorizando a funcionalidade do investimento.","Recomendamos o padrão Plus como ponto de partida — um equilíbrio inteligente entre custo e performance de locação.",,
+5 a 6,Premium,Investidor High-End,"Você demonstra visão de longo prazo e busca criar um ativo de alto padrão que se destaque no mercado.","Recomendamos o padrão Premium como ponto de partida — posicionando seu imóvel entre os mais desejados da região.",,
+7 a 9,Premium,Investidor High-End,"Você demonstra visão de longo prazo e busca criar um ativo de alto padrão que se destaque no mercado.","Recomendamos o padrão Premium como ponto de partida — posicionando seu imóvel entre os mais desejados da região.",,
+,,,,,,
+=== SEÇÃO 5: PREÇOS BASE POR PADRÃO ===,,,,,,
+Padrão,Preço Base (Spot),Preço Base (Não-Spot),,,,,
+Essential,"R$ 54.000","R$ 84.000",,,,,
+Plus,"R$ 60.000","R$ 90.000",,,,,
+Premium,"R$ 80.000","R$ 110.000",,,,,
+,,,,,,
+=== SEÇÃO 6: MODIFICADORES DE PREÇO ===,,,,,,
+Modificador,Condição,Impacto no Preço,,,,
+Empreendimento,Não é Spot,+R$ 30.000,,,,
+Infraestrutura,Básica,-R$ 15.000,,,,
+Marcenaria,Funcional,-R$ 8.000,,,,
+Eletrodomésticos,Essenciais,-R$ 5.000,,,,
+Hotelaria,Kit Próprio,-R$ 10.000,,,,
+Volume,5 unidades,-R$ 8.000/un,,,,
+Volume,6+ unidades,-R$ 14.000/un,,,,
+,,,,,,
+=== SEÇÃO 7: EXEMPLOS DE CENÁRIOS ===,,,,,,
+Cenário,Respostas Estratégicas,Spot?,Marcenaria,Eletros,Infra,Hotelaria,Unidades,Pontuação,Padrão,Perfil,Preço/Un,Total
+Mínimo,Todas A,Sim,Funcional,Essenciais,Básica,Próprio,1,0,Essential,"Estratégico","R$ 16.000","R$ 16.000"
+Econômico,Todas A,Sim,Funcional,Essenciais,Completa,Próprio,3,0,Essential,"Estratégico","R$ 31.000","R$ 93.000"
+Balanceado,1A + 2B,Sim,Premium,Essenciais,Completa,Seazone,2,6,Premium,"High-End","R$ 75.000","R$ 150.000"
+Máximo,Todas B,Não,Premium,Gourmet,Completa,Seazone,1,9,Premium,"High-End","R$ 110.000","R$ 110.000"
+Volume Premium,Todas B,Sim,Premium,Gourmet,Completa,Seazone,6,9,Premium,"High-End","R$ 66.000","R$ 396.000"

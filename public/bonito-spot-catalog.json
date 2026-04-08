@@ -1,0 +1,740 @@
+{
+  "empreendimento": {
+    "id": 10,
+    "nome": "Bonito Spot",
+    "endereco": "Rua Pedro Álvares Cabral, 629 - Alvorada - Bonito/MS - CEP: 79290000",
+    "indice_correcao": "IGP-M",
+    "mes_correcao": "01/11/2025"
+  },
+
+  "pacotes_disponiveis": ["Essential", "Plus", "Premium"],
+
+  "regras_negocio": {
+    "climatizador": {
+      "descricao": "Cliente pode alternar entre as duas opções. O pacote determina o padrão.",
+      "opcoes": [
+        { "nome": "Ar Condicionado | Frio 12000 BTUs", "preco": 2599.00, "pacote_padrao": ["Essential", "Plus"] },
+        { "nome": "Ar Condicionado | Quente/Frio 12000 BTUs", "preco": 2999.00, "pacote_padrao": ["Premium"] }
+      ]
+    },
+    "dependencias": [
+      {
+        "se_excluir": "categoria:Louças E Metais",
+        "exclui_automaticamente": ["categoria:Instalações Hidráulicas"],
+        "alerta": "Ao remover Louças e Metais, a instalação hidráulica (R$ 550,00) foi removida automaticamente."
+      },
+      {
+        "se_excluir": "categoria:Marmoraria",
+        "exclui_automaticamente": [
+          "Cooktop | 2 Bocas",
+          "Cuba inox cozinha | Lavinia | Tramontina",
+          "Misturador Cozinha | Cromado"
+        ],
+        "alerta": "Ao remover as bancadas de granito, o cooktop, a cuba e a torneira da cozinha foram removidos automaticamente."
+      }
+    ],
+    "personalizacao": "Cliente pode adicionar ou excluir qualquer produto individualmente.",
+    "catalogo_adicao": "Para adicionar itens, o cliente visualiza todos os produtos de todos os pacotes da sua tipologia.",
+    "vinculacao": "Produto → Categoria → Tipologia → Pacote → Apartamentos"
+  },
+
+  "taxas": {
+    "adm_percentual": 13.0,
+    "decor_por_pacote": {
+      "Essential": { "todas": 2500.00 },
+      "Plus":      { "todas": 3000.00 },
+      "Premium":   {
+        "A": 2500.00,
+        "B": 4000.00,
+        "C": 4000.00,
+        "D": 4000.00,
+        "E": 3000.00,
+        "F": 4000.00
+      }
+    }
+  },
+
+  "totais_referencia": {
+    "Essential": {
+      "A": 51698.53, "B": 57825.79, "C": 60165.11,
+      "D": 52428.35, "E": 53627.71, "F": 54373.96
+    },
+    "Plus": {
+      "A": 67397.82, "B": 74923.45, "C": 77588.22,
+      "D": 64957.13, "E": 66723.17, "F": 67570.91
+    },
+    "Premium": {
+      "A": 85287.57, "B": 93214.00, "C": 96042.61,
+      "D": 83589.90, "E": 81217.49, "F": 84079.73
+    }
+  },
+
+  "tipologias": {
+    "A": { "hospedes": 2, "apartamentos": ["101","102","103","107","108","109","110","111","112","113"] },
+    "B": { "hospedes": 4, "apartamentos": ["104","105"] },
+    "C": { "hospedes": 4, "apartamentos": ["106"] },
+    "D": { "hospedes": 2, "apartamentos": ["201","202","205","206","207","208","209","210","211","214","215","216","301","302","305","306","307","308","309","310","311","314","315","316","401","402","405","406","407","408","409"] },
+    "E": { "hospedes": 2, "apartamentos": ["203","204","303","304","403","404"] },
+    "F": { "hospedes": 2, "apartamentos": ["212","213","312","313"] }
+  },
+
+  "catalogo": {
+
+    "Essential": {
+      "categorias": {
+
+        "Marcenaria": {
+          "itens_por_tipologia": {
+            "A": [
+              { "nome": "Arara", "qtd": 1, "preco_unit": 400.00 },
+              { "nome": "Cabeceira", "qtd": 1, "preco_unit": 1400.00 },
+              { "nome": "Gabinete inferior", "qtd": 1, "preco_unit": 3300.00 },
+              { "nome": "Gabinete Superior", "qtd": 1, "preco_unit": 1100.00 },
+              { "nome": "Mesa/bancada", "qtd": 1, "preco_unit": 1200.00 },
+              { "nome": "Móvel de apoio", "qtd": 1, "preco_unit": 1000.00 },
+              { "nome": "Móvel do banheiro", "qtd": 1, "preco_unit": 600.00 }
+            ],
+            "B": [
+              { "nome": "Arara", "qtd": 1, "preco_unit": 400.00 },
+              { "nome": "Cabeceira", "qtd": 1, "preco_unit": 1400.00 },
+              { "nome": "Gabinete inferior", "qtd": 1, "preco_unit": 3300.00 },
+              { "nome": "Gabinete Superior", "qtd": 1, "preco_unit": 1100.00 },
+              { "nome": "Mesa/bancada", "qtd": 1, "preco_unit": 1600.00 },
+              { "nome": "Móvel de apoio", "qtd": 1, "preco_unit": 1000.00 },
+              { "nome": "Móvel do banheiro", "qtd": 1, "preco_unit": 450.00 }
+            ],
+            "C": [
+              { "nome": "Arara", "qtd": 1, "preco_unit": 400.00 },
+              { "nome": "Cabeceira", "qtd": 1, "preco_unit": 2000.00 },
+              { "nome": "Gabinete inferior", "qtd": 1, "preco_unit": 2700.00 },
+              { "nome": "Gabinete Superior", "qtd": 1, "preco_unit": 1100.00 },
+              { "nome": "Mesa/bancada", "qtd": 1, "preco_unit": 1200.00 },
+              { "nome": "Móvel de apoio", "qtd": 1, "preco_unit": 1000.00 },
+              { "nome": "Móvel do banheiro", "qtd": 1, "preco_unit": 600.00 }
+            ],
+            "D": [
+              { "nome": "Arara", "qtd": 1, "preco_unit": 400.00 },
+              { "nome": "Cabeceira", "qtd": 1, "preco_unit": 1400.00 },
+              { "nome": "Gabinete inferior", "qtd": 1, "preco_unit": 3300.00 },
+              { "nome": "Gabinete Superior", "qtd": 1, "preco_unit": 1100.00 },
+              { "nome": "Mesa/bancada", "qtd": 1, "preco_unit": 1200.00 },
+              { "nome": "Móvel de apoio", "qtd": 1, "preco_unit": 1000.00 },
+              { "nome": "Móvel do banheiro", "qtd": 1, "preco_unit": 600.00 }
+            ],
+            "E": [
+              { "nome": "Arara", "qtd": 1, "preco_unit": 400.00 },
+              { "nome": "Cabeceira", "qtd": 1, "preco_unit": 1400.00 },
+              { "nome": "Gabinete inferior", "qtd": 1, "preco_unit": 3300.00 },
+              { "nome": "Gabinete Superior", "qtd": 1, "preco_unit": 1100.00 },
+              { "nome": "Mesa/bancada", "qtd": 1, "preco_unit": 700.00 },
+              { "nome": "Móvel de apoio", "qtd": 1, "preco_unit": 1000.00 },
+              { "nome": "Móvel do banheiro", "qtd": 1, "preco_unit": 600.00 }
+            ],
+            "F": [
+              { "nome": "Arara", "qtd": 1, "preco_unit": 400.00 },
+              { "nome": "Cabeceira", "qtd": 1, "preco_unit": 1400.00 },
+              { "nome": "Gabinete inferior", "qtd": 1, "preco_unit": 3300.00 },
+              { "nome": "Gabinete Superior", "qtd": 1, "preco_unit": 1100.00 },
+              { "nome": "Mesa/bancada", "qtd": 1, "preco_unit": 1200.00 },
+              { "nome": "Móvel de apoio", "qtd": 1, "preco_unit": 1000.00 },
+              { "nome": "Móvel do banheiro", "qtd": 1, "preco_unit": 600.00 }
+            ]
+          }
+        },
+
+        "Marmoraria": {
+          "itens_por_tipologia": {
+            "A": [
+              { "nome": "Bancada de banheiro", "qtd": 1, "preco_unit": 2145.80 },
+              { "nome": "Bancada de cozinha", "qtd": 1, "preco_unit": 3030.92 }
+            ],
+            "B": [
+              { "nome": "Bancada de banheiro", "qtd": 1, "preco_unit": 1257.23 },
+              { "nome": "Bancada de cozinha", "qtd": 1, "preco_unit": 3030.92 }
+            ],
+            "C": [
+              { "nome": "Bancada de banheiro", "qtd": 1, "preco_unit": 1870.48 },
+              { "nome": "Bancada de cozinha", "qtd": 1, "preco_unit": 3030.92 }
+            ],
+            "D": [
+              { "nome": "Bancada de banheiro", "qtd": 1, "preco_unit": 2145.80 },
+              { "nome": "Bancada de cozinha", "qtd": 1, "preco_unit": 3030.92 }
+            ],
+            "E": [
+              { "nome": "Bancada de banheiro", "qtd": 1, "preco_unit": 1499.94 },
+              { "nome": "Bancada de cozinha", "qtd": 1, "preco_unit": 3030.92 }
+            ],
+            "F": [
+              { "nome": "Bancada de banheiro", "qtd": 1, "preco_unit": 2145.80 },
+              { "nome": "Bancada de cozinha", "qtd": 1, "preco_unit": 3030.92 }
+            ]
+          }
+        },
+
+        "Louças E Metais": {
+          "obs": "Idêntico em todas as tipologias Essential. Total: R$ 4.695,80",
+          "itens_comuns": [
+            { "nome": "Acabamento de registro | Cromado", "qtd": 2 },
+            { "nome": "Acabamento de registro de pressão | Cromado", "qtd": 1 },
+            { "nome": "Chuveiro a gás | Cromado", "qtd": 1 },
+            { "nome": "Cuba de apoio | Celite", "qtd": 1 },
+            { "nome": "Cuba inox cozinha | Lavinia | Tramontina", "qtd": 1, "depende_de": "Marmoraria" },
+            { "nome": "Filtro de Água", "qtd": 1, "preco_unit": 320.00 },
+            { "nome": "Flexível | Docol", "qtd": 2 },
+            { "nome": "Kit de Metais | Cromado", "qtd": 1 },
+            { "nome": "Misturador banheiro | Cromado", "qtd": 1 },
+            { "nome": "Misturador Cozinha | Cromado", "qtd": 1, "depende_de": "Marmoraria" },
+            { "nome": "Porta shampoo de Canto | Cromado", "qtd": 1 },
+            { "nome": "Sifão Cromado | Docol", "qtd": 1 },
+            { "nome": "Sifão Sanfonado | Docol", "qtd": 1 },
+            { "nome": "Válvula cuba banheiro", "qtd": 1, "preco_unit": 149.90 }
+          ],
+          "total": 4695.80
+        },
+
+        "Vidraçaria": {
+          "itens_comuns": [
+            { "nome": "Box Reto | Cromado", "qtd": 1 }
+          ]
+        },
+
+        "Iluminação": {
+          "itens_comuns": [
+            { "nome": "Lâmpada | GU10", "preco_unit": 18.32 },
+            { "nome": "Painel LED 18W", "preco_unit": 17.58 },
+            { "nome": "Painel LED 24W", "preco_unit": 23.70 },
+            { "nome": "Spot sobrepor | Branco", "preco_unit": 47.90 }
+          ],
+          "obs": "Quantidades variam por tipologia"
+        },
+
+        "Mobiliário": {
+          "itens_por_tipologia": {
+            "A": [
+              { "nome": "Cadeira Thonix", "qtd": 2, "preco_unit": 349.90 },
+              { "nome": "Cama box Queen s/ cama auxiliar", "qtd": 1, "preco_unit": 1811.78 },
+              { "nome": "Cortina | Gaze e Blackout", "qtd": 1, "preco_unit": 1630.00 },
+              { "nome": "Espelho banheiro", "qtd": 1, "preco_unit": 299.90 },
+              { "nome": "Espelho corpo inteiro | Shay Tauari", "qtd": 1, "preco_unit": 751.85 }
+            ],
+            "B": [
+              { "nome": "Cadeira Thonix", "qtd": 2, "preco_unit": 349.90 },
+              { "nome": "Cama box Queen s/ cama auxiliar", "qtd": 1, "preco_unit": 1811.78 },
+              { "nome": "Cortina | Gaze e Blackout", "qtd": 1, "preco_unit": 1630.00 },
+              { "nome": "Espelho banheiro", "qtd": 1, "preco_unit": 299.90 },
+              { "nome": "Mesa Cabeceira Flórida", "qtd": 1, "preco_unit": 199.90 },
+              { "nome": "Mesa Sofá Alta Wing", "qtd": 1, "preco_unit": 289.90 },
+              { "nome": "Puff Tambor Rattan", "qtd": 2, "preco_unit": 399.88 },
+              { "nome": "Sofá-cama | Belize Aveia", "qtd": 1, "preco_unit": 3048.88 }
+            ],
+            "C": [
+              { "nome": "Cadeira Thonix", "qtd": 2, "preco_unit": 349.90 },
+              { "nome": "Cama box Queen s/ cama auxiliar", "qtd": 1, "preco_unit": 1811.78 },
+              { "nome": "Cortina | Gaze e Blackout", "qtd": 2, "preco_unit": 1630.00 },
+              { "nome": "Espelho banheiro", "qtd": 1, "preco_unit": 299.90 },
+              { "nome": "Espelho corpo inteiro | Shay Tauari", "qtd": 1, "preco_unit": 751.85 },
+              { "nome": "Mesa Sofá Alta Wing", "qtd": 1, "preco_unit": 289.90 },
+              { "nome": "Puff Tambor Rattan", "qtd": 2, "preco_unit": 399.88 },
+              { "nome": "Sofá-cama | Belize Aveia", "qtd": 1, "preco_unit": 3048.88 }
+            ],
+            "D": [
+              { "nome": "Cadeira Thonix", "qtd": 2, "preco_unit": 349.90 },
+              { "nome": "Cama box Queen s/ cama auxiliar", "qtd": 1, "preco_unit": 1811.78 },
+              { "nome": "Cortina | Gaze e Blackout", "qtd": 1, "preco_unit": 1630.00 },
+              { "nome": "Espelho banheiro", "qtd": 1, "preco_unit": 299.90 },
+              { "nome": "Espelho corpo inteiro | Shay Tauari", "qtd": 1, "preco_unit": 751.85 }
+            ],
+            "E": [
+              { "nome": "Cadeira Thonix", "qtd": 1, "preco_unit": 349.90 },
+              { "nome": "Cama box Queen s/ cama auxiliar", "qtd": 1, "preco_unit": 1811.78 },
+              { "nome": "Cortina | Gaze e Blackout", "qtd": 2, "preco_unit": 1630.00 },
+              { "nome": "Espelho banheiro", "qtd": 1, "preco_unit": 299.90 },
+              { "nome": "Espelho corpo inteiro | Moana Oval Tauari", "qtd": 1, "preco_unit": 847.43 },
+              { "nome": "Mesa Cabeceira Bel Off White", "qtd": 1, "preco_unit": 339.90 },
+              { "nome": "Puff Tambor Rattan", "qtd": 1, "preco_unit": 399.88 }
+            ],
+            "F": [
+              { "nome": "Cadeira Thonix", "qtd": 2, "preco_unit": 349.90 },
+              { "nome": "Cama box Queen s/ cama auxiliar", "qtd": 1, "preco_unit": 1811.78 },
+              { "nome": "Cortina | Gaze e Blackout", "qtd": 2, "preco_unit": 1630.00 },
+              { "nome": "Espelho banheiro", "qtd": 1, "preco_unit": 299.90 },
+              { "nome": "Espelho corpo inteiro | Shay Tauari", "qtd": 1, "preco_unit": 751.85 }
+            ]
+          }
+        },
+
+        "Decoração": {
+          "obs": "Idêntico em todas as tipologias Essential",
+          "itens_comuns": [
+            { "nome": "Almofada Seazone", "qtd": 1, "preco_unit": 54.00 },
+            { "nome": "Capacho Seazone", "qtd": 1, "preco_unit": 66.01 },
+            { "nome": "Luminária Seazone", "qtd": 1, "preco_unit": 210.00 },
+            { "nome": "Quadro Moldura Madeira | 30x40", "qtd": 2, "preco_unit": 95.00 },
+            { "nome": "Vaso de planta", "qtd": 1, "preco_unit": 144.00 }
+          ]
+        },
+
+        "Eletrodomésticos E Eletroportáteis": {
+          "itens_comuns": [
+            { "nome": "Ar Condicionado | Frio 12000 BTUs", "qtd": 1, "preco_unit": 2599.00, "opcao_climatizador": true },
+            { "nome": "Cafeteira Elétrica | 15 xícaras", "qtd": 1, "preco_unit": 229.00 },
+            { "nome": "Chaleira Elétrica | 1,8L", "qtd": 1, "preco_unit": 209.90 },
+            { "nome": "Cooktop | 2 Bocas", "qtd": 1, "preco_unit": 1319.00, "depende_de": "Marmoraria" },
+            { "nome": "Frigobar | Branco 67L", "qtd": 1, "preco_unit": 1299.00 },
+            { "nome": "Liquidificador | 2,7L", "qtd": 1, "preco_unit": 249.90 },
+            { "nome": "Microondas | 20L", "qtd": 1, "preco_unit": 759.00 },
+            { "nome": "Sanduicheira/Mini Grill", "qtd": 1, "preco_unit": 199.90 },
+            { "nome": "Secador de Cabelo | 1700W", "qtd": 1, "preco_unit": 269.90 },
+            { "nome": "TV Smart 43\"", "qtd": 1, "preco_unit": 2619.00 },
+            { "nome": "Vaporizador portátil | 700W", "qtd": 1, "preco_unit": 169.90 }
+          ],
+          "suporte_tv_por_tipologia": {
+            "A": { "nome": "Suporte TV | Teto", "preco_unit": 325.90 },
+            "B": { "nome": "Suporte TV | Fixo", "preco_unit": 82.90 },
+            "C": { "nome": "Suporte TV | Teto", "preco_unit": 325.90 },
+            "D": { "nome": "Suporte TV | Fixo", "preco_unit": 82.90 },
+            "E": { "nome": "Suporte TV | Teto", "preco_unit": 325.90 },
+            "F": { "nome": "Suporte TV | Teto", "preco_unit": 325.90 }
+          }
+        },
+
+        "Operacionais": {
+          "obs": "Qtd base: 3 itens para 2 hóspedes (A/D/E/F), 5 itens para 4 hóspedes (B/C). Lençol/Manta/Virol Casal apenas B/C.",
+          "itens_comuns": [
+            { "nome": "Abridor de Garrafas", "qtd": 1, "preco_unit": 24.99 },
+            { "nome": "Balde", "qtd": 1, "preco_unit": 59.90 },
+            { "nome": "Bowl", "preco_unit": 26.90, "qtd_2hosp": 3, "qtd_4hosp": 5 },
+            { "nome": "Cabide", "qtd": 2, "preco_unit": 18.57 },
+            { "nome": "Cabideiro", "qtd": 1, "preco_unit": 16.99 },
+            { "nome": "Colher", "preco_unit": 5.90, "qtd_2hosp": 3, "qtd_4hosp": 5 },
+            { "nome": "Colher de chá", "preco_unit": 3.90, "qtd_2hosp": 3, "qtd_4hosp": 5 },
+            { "nome": "Copo de vidro", "preco_unit": 9.90, "qtd_2hosp": 3, "qtd_4hosp": 5 },
+            { "nome": "Dispenser detergente e esponja", "qtd": 1, "preco_unit": 22.99 },
+            { "nome": "Escorredor de Louças", "qtd": 1, "preco_unit": 29.99 },
+            { "nome": "Escova Sanitária", "qtd": 1, "preco_unit": 59.99 },
+            { "nome": "Faca", "preco_unit": 8.90, "qtd_2hosp": 3, "qtd_4hosp": 5 },
+            { "nome": "Faca de corte", "qtd": 2, "preco_unit": 26.90 },
+            { "nome": "Fronha", "qtd": 12, "preco_unit": 11.39 },
+            { "nome": "Garfo", "preco_unit": 5.90, "qtd_2hosp": 3, "qtd_4hosp": 5 },
+            { "nome": "Jarra de água", "qtd": 1, "preco_unit": 29.99 },
+            { "nome": "Jogo de panela c/ frigideira", "qtd": 1, "preco_unit": 371.45 },
+            { "nome": "Jogo de Utensílios", "qtd": 1, "preco_unit": 46.90 },
+            { "nome": "Kit vassoura e pá", "qtd": 1, "preco_unit": 49.90 },
+            { "nome": "Kit vassourinha e pá", "qtd": 1, "preco_unit": 32.50 },
+            { "nome": "Lençol Queen", "qtd": 3, "preco_unit": 72.92 },
+            { "nome": "Lençol Casal", "qtd": 3, "preco_unit": 57.83, "apenas_tipologias": ["B","C"] },
+            { "nome": "Lixeira", "qtd": 1, "preco_unit": 119.99 },
+            { "nome": "Lixeira", "qtd": 1, "preco_unit": 62.99 },
+            { "nome": "Lixeira de pia", "qtd": 1, "preco_unit": 49.99 },
+            { "nome": "Lugar americano", "preco_unit": 19.90, "qtd_2hosp": 3, "qtd_4hosp": 5 },
+            { "nome": "Manta Queen", "qtd": 3, "preco_unit": 90.11 },
+            { "nome": "Manta Casal", "qtd": 3, "preco_unit": 67.25, "apenas_tipologias": ["B","C"] },
+            { "nome": "Pano de prato", "qtd": 1, "preco_unit": 39.90 },
+            { "nome": "Pegador de massa", "qtd": 1, "preco_unit": 20.90 },
+            { "nome": "Peneira", "qtd": 1, "preco_unit": 89.90 },
+            { "nome": "Porta escova de dente", "qtd": 1, "preco_unit": 26.99 },
+            { "nome": "Pote de vidro", "qtd": 1, "preco_unit": 30.97 },
+            { "nome": "Prato de sobremesa", "preco_unit": 15.90, "qtd_2hosp": 3, "qtd_4hosp": 5 },
+            { "nome": "Prato Raso", "preco_unit": 24.90, "qtd_2hosp": 3, "qtd_4hosp": 5 },
+            { "nome": "Rodo", "qtd": 1, "preco_unit": 34.90 },
+            { "nome": "Rodo de pia", "qtd": 1, "preco_unit": 23.99 },
+            { "nome": "Saboneteira", "qtd": 1, "preco_unit": 12.99 },
+            { "nome": "Tábua", "qtd": 1, "preco_unit": 48.90 },
+            { "nome": "Taça de Vinho", "preco_unit": 19.90, "qtd_2hosp": 3, "qtd_4hosp": 5 },
+            { "nome": "Tapete", "qtd": 3, "preco_unit": 27.58 },
+            { "nome": "Tesoura", "qtd": 1, "preco_unit": 22.80 },
+            { "nome": "Toalha Banho", "preco_unit": 42.91, "qtd_2hosp": 6, "qtd_4hosp": 12 },
+            { "nome": "Toalha Rosto", "qtd": 3, "preco_unit": 18.51 },
+            { "nome": "Travesseiros", "qtd": 4, "preco_unit": 32.90 },
+            { "nome": "Virol Queen", "qtd": 3, "preco_unit": 72.92 },
+            { "nome": "Virol Casal", "qtd": 3, "preco_unit": 57.83, "apenas_tipologias": ["B","C"] },
+            { "nome": "Xícara", "preco_unit": 23.90, "qtd_2hosp": 3, "qtd_4hosp": 5 }
+          ]
+        },
+
+        "Pintura": {
+          "itens_comuns": [
+            { "nome": "Pintura lisa", "preco_unit": 25.00, "unidade": "m²", "obs": "m² varia por tipologia" }
+          ]
+        },
+
+        "Detalhamento Do Projeto": {
+          "itens_comuns": [
+            { "nome": "Detalhamento de marmoraria, pontos elétricos e acabamentos", "qtd": 1, "preco_unit": 450.00 }
+          ]
+        },
+
+        "Feltro": {
+          "itens_comuns": [
+            { "nome": "Aplicação de feltro nos mobiliários", "qtd": 1, "preco_unit": 250.00 }
+          ]
+        },
+
+        "Instalações Elétricas": {
+          "itens_comuns": [
+            { "nome": "Instalações elétricas", "qtd": 1, "preco_unit": 700.00 }
+          ]
+        },
+
+        "Instalações Hidráulicas": {
+          "dependencia": "Louças E Metais",
+          "itens_comuns": [
+            { "nome": "Instalações hidráulicas", "qtd": 1, "preco_unit": 550.00 }
+          ]
+        },
+
+        "Instalações Ar-Condicionado": {
+          "itens_comuns": [
+            { "nome": "Instalação de ar condicionado", "qtd": 1, "preco_unit": 800.00 }
+          ]
+        },
+
+        "Instalações Gerais": {
+          "itens_comuns": [
+            { "nome": "Instalações gerais", "qtd": 1, "preco_unit": 250.00 }
+          ]
+        },
+
+        "Limpeza": {
+          "itens_comuns": [
+            { "nome": "Limpeza e arrumação", "qtd": 1, "preco_unit": 450.00 }
+          ]
+        },
+
+        "Impermeabilização": {
+          "obs": "Apenas tipologias A, D, E, F no Essential",
+          "itens_por_tipologia": {
+            "A": [{ "nome": "Impermeabilização mobiliário externo", "qtd": 1, "preco_unit": 400.00 }],
+            "D": [{ "nome": "Impermeabilização mobiliário externo", "qtd": 1, "preco_unit": 400.00 }],
+            "E": [{ "nome": "Impermeabilização mobiliário externo", "qtd": 1, "preco_unit": 400.00 }],
+            "F": [{ "nome": "Impermeabilização mobiliário externo", "qtd": 1, "preco_unit": 400.00 }]
+          }
+        },
+
+        "RRT": {
+          "itens_comuns": [
+            { "nome": "RRT", "qtd": 1, "preco_unit": 125.40 }
+          ]
+        }
+      }
+    },
+
+    "Plus": {
+      "obs": "O Plus herda a estrutura do Essential com as diferenças abaixo. Taxa Decor sobe de R$2.500 para R$3.000. Sem Impermeabilização.",
+      "categorias": {
+
+        "Marcenaria": {
+          "diferenciais_vs_essential": "Arara planejada (R$2.200 vs R$400). Cabeceira melhorada. Gabinete Superior premium (R$2.500 vs R$1.100). Móvel do banheiro R$800 (era R$600/450). Vassoureiro incluído. Prateleira incluída em A/B/C/D.",
+          "itens_por_tipologia": {
+            "A": [
+              { "nome": "Arara (planejada)", "qtd": 1, "preco_unit": 2200.00 },
+              { "nome": "Cabeceira", "qtd": 1, "preco_unit": 1800.00 },
+              { "nome": "Gabinete inferior", "qtd": 1, "preco_unit": 3300.00 },
+              { "nome": "Gabinete Superior", "qtd": 1, "preco_unit": 2500.00 },
+              { "nome": "Mesa/bancada", "qtd": 1, "preco_unit": 800.00 },
+              { "nome": "Móvel do banheiro", "qtd": 1, "preco_unit": 800.00 },
+              { "nome": "Prateleira", "qtd": 1, "preco_unit": 450.00 },
+              { "nome": "Vassoureiro", "qtd": 1, "preco_unit": 1950.00 }
+            ],
+            "B": [
+              { "nome": "Arara (planejada)", "qtd": 1, "preco_unit": 2200.00 },
+              { "nome": "Cabeceira", "qtd": 1, "preco_unit": 1800.00 },
+              { "nome": "Gabinete inferior", "qtd": 1, "preco_unit": 2700.00 },
+              { "nome": "Gabinete Superior", "qtd": 1, "preco_unit": 2500.00 },
+              { "nome": "Mesa/bancada", "qtd": 1, "preco_unit": 1800.00 },
+              { "nome": "Móvel do banheiro", "qtd": 1, "preco_unit": 800.00 },
+              { "nome": "Prateleira", "qtd": 1, "preco_unit": 500.00 },
+              { "nome": "Vassoureiro", "qtd": 1, "preco_unit": 1950.00 }
+            ],
+            "C": [
+              { "nome": "Arara (planejada)", "qtd": 1, "preco_unit": 2200.00 },
+              { "nome": "Cabeceira", "qtd": 1, "preco_unit": 2400.00 },
+              { "nome": "Gabinete inferior", "qtd": 1, "preco_unit": 2700.00 },
+              { "nome": "Gabinete Superior", "qtd": 1, "preco_unit": 2500.00 },
+              { "nome": "Mesa/bancada", "qtd": 1, "preco_unit": 800.00 },
+              { "nome": "Móvel do banheiro", "qtd": 1, "preco_unit": 800.00 },
+              { "nome": "Prateleira", "qtd": 1, "preco_unit": 450.00 },
+              { "nome": "Vassoureiro", "qtd": 1, "preco_unit": 1950.00 }
+            ],
+            "D": [
+              { "nome": "Arara (planejada)", "qtd": 1, "preco_unit": 2200.00 },
+              { "nome": "Cabeceira", "qtd": 1, "preco_unit": 1800.00 },
+              { "nome": "Gabinete inferior", "qtd": 1, "preco_unit": 3300.00 },
+              { "nome": "Gabinete Superior", "qtd": 1, "preco_unit": 2500.00 },
+              { "nome": "Mesa/bancada", "qtd": 1, "preco_unit": 800.00 },
+              { "nome": "Móvel do banheiro", "qtd": 1, "preco_unit": 800.00 },
+              { "nome": "Prateleira", "qtd": 1, "preco_unit": 450.00 },
+              { "nome": "Vassoureiro", "qtd": 1, "preco_unit": 1950.00 }
+            ],
+            "E": [
+              { "nome": "Arara (planejada)", "qtd": 1, "preco_unit": 2200.00 },
+              { "nome": "Cabeceira", "qtd": 1, "preco_unit": 1800.00 },
+              { "nome": "Gabinete inferior", "qtd": 1, "preco_unit": 3300.00 },
+              { "nome": "Gabinete Superior", "qtd": 1, "preco_unit": 2500.00 },
+              { "nome": "Mesa/bancada", "qtd": 1, "preco_unit": 800.00 },
+              { "nome": "Móvel do banheiro", "qtd": 1, "preco_unit": 800.00 },
+              { "nome": "Vassoureiro", "qtd": 1, "preco_unit": 2100.00 }
+            ],
+            "F": [
+              { "nome": "Arara (planejada)", "qtd": 1, "preco_unit": 2200.00 },
+              { "nome": "Cabeceira", "qtd": 1, "preco_unit": 1800.00 },
+              { "nome": "Gabinete inferior", "qtd": 1, "preco_unit": 3300.00 },
+              { "nome": "Gabinete Superior", "qtd": 1, "preco_unit": 2500.00 },
+              { "nome": "Mesa/bancada", "qtd": 1, "preco_unit": 1700.00 },
+              { "nome": "Móvel do banheiro", "qtd": 1, "preco_unit": 800.00 },
+              { "nome": "Vassoureiro", "qtd": 1, "preco_unit": 1950.00 }
+            ]
+          }
+        },
+
+        "Marmoraria": {
+          "itens_por_tipologia": {
+            "A": [
+              { "nome": "Bancada de banheiro", "qtd": 1, "preco_unit": 2145.80 },
+              { "nome": "Bancada de cozinha", "qtd": 1, "preco_unit": 3175.82 }
+            ],
+            "B": [
+              { "nome": "Bancada de banheiro", "qtd": 1, "preco_unit": 1257.23 },
+              { "nome": "Bancada de cozinha", "qtd": 1, "preco_unit": 3175.82 }
+            ],
+            "C": [
+              { "nome": "Bancada de banheiro", "qtd": 1, "preco_unit": 2145.80 },
+              { "nome": "Bancada de cozinha", "qtd": 1, "preco_unit": 3175.82 }
+            ],
+            "D": [
+              { "nome": "Bancada de banheiro", "qtd": 1, "preco_unit": 2145.80 },
+              { "nome": "Bancada de cozinha", "qtd": 1, "preco_unit": 3175.82 }
+            ],
+            "E": [
+              { "nome": "Bancada de banheiro", "qtd": 1, "preco_unit": 2145.80 },
+              { "nome": "Bancada de cozinha", "qtd": 1, "preco_unit": 3175.82 }
+            ],
+            "F": [
+              { "nome": "Bancada de banheiro", "qtd": 1, "preco_unit": 2145.80 },
+              { "nome": "Bancada de cozinha", "qtd": 1, "preco_unit": 3175.82 }
+            ]
+          }
+        },
+
+        "Louças E Metais": {
+          "obs": "Idêntico em todas as tipologias Plus. Total: R$ 5.894,30. Substituições vs Essential: Cuba Celite → Cuba Roca; remove Kit Metais; adiciona Papeleira, Porta sabonete/shampoo, Toalheiro rosto, Toalheiro térmico; remove Porta shampoo de Canto.",
+          "total": 5894.30,
+          "itens_comuns": [
+            { "nome": "Acabamento de registro | Cromado", "qtd": 2 },
+            { "nome": "Acabamento de registro de pressão | Cromado", "qtd": 1 },
+            { "nome": "Chuveiro a gás | Cromado", "qtd": 1 },
+            { "nome": "Cuba de apoio | Roca", "qtd": 1 },
+            { "nome": "Cuba inox cozinha | Lavinia | Tramontina", "qtd": 1, "depende_de": "Marmoraria" },
+            { "nome": "Filtro de Água", "qtd": 1, "preco_unit": 320.00 },
+            { "nome": "Flexível | Docol", "qtd": 2 },
+            { "nome": "Misturador banheiro | Cromado", "qtd": 1 },
+            { "nome": "Misturador Cozinha | Cromado", "qtd": 1, "depende_de": "Marmoraria" },
+            { "nome": "Papeleira | Cromado", "qtd": 1 },
+            { "nome": "Porta sabonete/shampoo | Cromado", "qtd": 1 },
+            { "nome": "Sifão Cromado | Docol", "qtd": 1 },
+            { "nome": "Sifão Sanfonado | Docol", "qtd": 1 },
+            { "nome": "Toalheiro rosto | Cromado", "qtd": 1 },
+            { "nome": "Toalheiro térmico | Cromado", "qtd": 1 },
+            { "nome": "Válvula cuba banheiro", "qtd": 1, "preco_unit": 149.90 }
+          ]
+        },
+
+        "Vidraçaria": {
+          "itens_comuns": [
+            { "nome": "Box Reto | Cromado", "qtd": 1 }
+          ]
+        },
+
+        "Iluminação": {
+          "diferenciais_vs_essential": "Adiciona Arandelas. A/D usam Portofino Branco. Outras tipologias usam Rotativo Branco ou Wooden dependendo do projeto. Adiciona Lâmpada E27.",
+          "itens_comuns": [
+            { "nome": "Lâmpada | E27", "preco_unit": 4.59 },
+            { "nome": "Lâmpada | GU10", "preco_unit": 18.32 },
+            { "nome": "Painel LED 18W", "preco_unit": 17.58 },
+            { "nome": "Painel LED 24W", "preco_unit": 23.70 },
+            { "nome": "Spot sobrepor | Branco", "preco_unit": 47.90 }
+          ],
+          "arandela_por_tipologia": {
+            "A": { "nome": "Arandela | Portofino Branco", "preco_unit": 209.37 },
+            "B": { "nome": "Arandela | Rotativo Branco", "preco_unit": 383.99 },
+            "C": { "nome": "Arandela | Rotativo Branco", "preco_unit": 383.99 },
+            "D": { "nome": "Arandela | Portofino Branco", "preco_unit": 209.37 },
+            "E": { "nome": "Arandela | Rotativo Branco", "preco_unit": 383.99 },
+            "F": { "nome": "Arandela | Rotativo Branco", "preco_unit": 383.99 }
+          }
+        },
+
+        "Mobiliário": {
+          "diferenciais_vs_essential": "Cadeira Déco Premium (R$899,99) substitui Thonix (R$349,90). Espelho Scand Tauari substitui espelho simples. Espelho corpo inteiro Moana Oval para todas. Adiciona itens de jardim (A/B/C): Mesa Norton Cimento + Cadeira Buena Vista. Puff Heath Lis Marrom substitui Tambor Rattan (B/C). Adiciona Mesa Sofá Selin (B/C) e Porcelana (E). Mesa Cabeceira Camby Marrom em B.",
+          "itens_por_tipologia": {
+            "A": [
+              { "nome": "Cadeira | Déco Premium", "qtd": 2, "preco_unit": 899.99 },
+              { "nome": "Cadeira jardim | Buena Vista Caramelo", "qtd": 2, "preco_unit": 669.90 },
+              { "nome": "Cama box Queen s/ cama auxiliar", "qtd": 1, "preco_unit": 1811.78 },
+              { "nome": "Cortina | Gaze e Blackout", "qtd": 1, "preco_unit": 1630.00 },
+              { "nome": "Espelho banheiro | Scand Tauari", "qtd": 1, "preco_unit": 374.39 },
+              { "nome": "Espelho corpo inteiro | Moana Oval Tauari", "qtd": 1, "preco_unit": 847.43 },
+              { "nome": "Mesa de apoio jardim | Norton Cimento", "qtd": 1, "preco_unit": 1490.00 }
+            ],
+            "B": [
+              { "nome": "Cadeira | Déco Premium", "qtd": 2, "preco_unit": 899.99 },
+              { "nome": "Cadeira jardim | Buena Vista Caramelo", "qtd": 2, "preco_unit": 669.90 },
+              { "nome": "Cama box Queen s/ cama auxiliar", "qtd": 1, "preco_unit": 1811.78 },
+              { "nome": "Cortina | Gaze e Blackout", "qtd": 1, "preco_unit": 1630.00 },
+              { "nome": "Espelho banheiro | Scand Tauari", "qtd": 1, "preco_unit": 374.39 },
+              { "nome": "Espelho corpo inteiro | Moana Oval Tauari", "qtd": 1, "preco_unit": 847.43 },
+              { "nome": "Mesa Cabeceira Camby Marrom", "qtd": 1, "preco_unit": 694.90 },
+              { "nome": "Mesa de apoio jardim | Norton Cimento", "qtd": 1, "preco_unit": 1490.00 },
+              { "nome": "Mesa Sofá Alta Selin", "qtd": 1, "preco_unit": 699.90 },
+              { "nome": "Puff Heath Lis Marrom", "qtd": 2, "preco_unit": 822.90 },
+              { "nome": "Sofá-cama | Belize Aveia", "qtd": 1, "preco_unit": 3048.88 }
+            ],
+            "C": [
+              { "nome": "Cadeira | Déco Premium", "qtd": 2, "preco_unit": 899.99 },
+              { "nome": "Cadeira jardim | Buena Vista Caramelo", "qtd": 2, "preco_unit": 669.90 },
+              { "nome": "Cama box Queen s/ cama auxiliar", "qtd": 1, "preco_unit": 1811.78 },
+              { "nome": "Cortina | Gaze e Blackout", "qtd": 2, "preco_unit": 1630.00 },
+              { "nome": "Espelho banheiro | Scand Tauari", "qtd": 1, "preco_unit": 374.39 },
+              { "nome": "Espelho corpo inteiro | Moana Oval Tauari", "qtd": 1, "preco_unit": 847.43 },
+              { "nome": "Mesa de apoio jardim | Norton Cimento", "qtd": 1, "preco_unit": 1490.00 },
+              { "nome": "Mesa Sofá Alta Selin", "qtd": 1, "preco_unit": 699.90 },
+              { "nome": "Puff Heath Lis Marrom", "qtd": 2, "preco_unit": 822.90 },
+              { "nome": "Sofá-cama | Belize Aveia", "qtd": 1, "preco_unit": 3048.88 }
+            ],
+            "D": [
+              { "nome": "Cadeira | Déco Premium", "qtd": 2, "preco_unit": 899.99 },
+              { "nome": "Cama box Queen s/ cama auxiliar", "qtd": 1, "preco_unit": 1811.78 },
+              { "nome": "Cortina | Gaze e Blackout", "qtd": 1, "preco_unit": 1630.00 },
+              { "nome": "Espelho banheiro | Scand Tauari", "qtd": 1, "preco_unit": 374.39 },
+              { "nome": "Espelho corpo inteiro | Moana Oval Tauari", "qtd": 1, "preco_unit": 847.43 }
+            ],
+            "E": [
+              { "nome": "Cadeira | Déco Premium", "qtd": 1, "preco_unit": 899.99 },
+              { "nome": "Cama box Queen s/ cama auxiliar", "qtd": 1, "preco_unit": 1811.78 },
+              { "nome": "Cortina | Gaze e Blackout", "qtd": 2, "preco_unit": 1630.00 },
+              { "nome": "Espelho banheiro | Scand Tauari", "qtd": 1, "preco_unit": 374.39 },
+              { "nome": "Espelho corpo inteiro | Moana Oval Tauari", "qtd": 1, "preco_unit": 847.43 },
+              { "nome": "Mesa Sofá Porcelana", "qtd": 1, "preco_unit": 499.90 }
+            ],
+            "F": [
+              { "nome": "Cadeira | Déco Premium", "qtd": 2, "preco_unit": 899.99 },
+              { "nome": "Cama box Queen s/ cama auxiliar", "qtd": 1, "preco_unit": 1811.78 },
+              { "nome": "Cortina | Gaze e Blackout", "qtd": 2, "preco_unit": 1630.00 },
+              { "nome": "Espelho banheiro | Scand Tauari", "qtd": 1, "preco_unit": 374.39 },
+              { "nome": "Espelho corpo inteiro | Moana Oval Tauari", "qtd": 1, "preco_unit": 847.43 }
+            ]
+          }
+        },
+
+        "Decoração": {
+          "obs": "Quadro maior: 50x70 (R$215) substitui 30x40 (R$95). Demais itens iguais ao Essential.",
+          "itens_comuns": [
+            { "nome": "Almofada Seazone", "qtd": 1, "preco_unit": 54.00 },
+            { "nome": "Capacho Seazone", "qtd": 1, "preco_unit": 66.01 },
+            { "nome": "Luminária Seazone", "qtd": 1, "preco_unit": 210.00 },
+            { "nome": "Quadro Moldura Madeira | 50x70", "qtd": 2, "preco_unit": 215.00 },
+            { "nome": "Vaso de planta", "qtd": 1, "preco_unit": 144.00 }
+          ]
+        },
+
+        "Eletrodomésticos E Eletroportáteis": {
+          "diferenciais_vs_essential": "AC padrão sobe para Quente/Frio R$2.999. Adiciona Depurador R$1.049. Frigobar maior: 76L R$2.349 (era 67L R$1.299). TV mantém 43\". Vaporizador mantém 700W.",
+          "itens_comuns": [
+            { "nome": "Ar Condicionado | Quente/Frio 12000 BTUs", "qtd": 1, "preco_unit": 2999.00, "opcao_climatizador": true },
+            { "nome": "Cafeteira Elétrica | 15 xícaras", "qtd": 1, "preco_unit": 229.00 },
+            { "nome": "Chaleira Elétrica | 1,8L", "qtd": 1, "preco_unit": 209.90 },
+            { "nome": "Cooktop | 2 Bocas", "qtd": 1, "preco_unit": 1319.00, "depende_de": "Marmoraria" },
+            { "nome": "Depurador", "qtd": 1, "preco_unit": 1049.00 },
+            { "nome": "Frigobar | Branco 76L", "qtd": 1, "preco_unit": 2349.00 },
+            { "nome": "Liquidificador | 2,7L", "qtd": 1, "preco_unit": 249.90 },
+            { "nome": "Microondas | 20L", "qtd": 1, "preco_unit": 759.00 },
+            { "nome": "Sanduicheira/Mini Grill", "qtd": 1, "preco_unit": 199.90 },
+            { "nome": "Secador de Cabelo | 1700W", "qtd": 1, "preco_unit": 269.90 },
+            { "nome": "TV Smart 43\"", "qtd": 1, "preco_unit": 2619.00 },
+            { "nome": "Vaporizador portátil | 700W", "qtd": 1, "preco_unit": 169.90 }
+          ],
+          "suporte_tv_por_tipologia": {
+            "A": { "nome": "Suporte TV | Fixo", "preco_unit": 82.90 },
+            "B": { "nome": "Suporte TV | Fixo", "preco_unit": 82.90 },
+            "C": { "nome": "Suporte TV | Teto", "preco_unit": 325.90 },
+            "D": { "nome": "Suporte TV | Fixo", "preco_unit": 82.90 },
+            "E": { "nome": "Suporte TV | Teto", "preco_unit": 325.90 },
+            "F": { "nome": "Suporte TV | Teto", "preco_unit": 325.90 }
+          }
+        },
+
+        "Operacionais": {
+          "obs": "Mesmos itens do Essential. Qtd base: 3 para 2 hóspedes, 5 para 4 hóspedes. Lençol/Manta/Virol Casal apenas B/C."
+        },
+
+        "Pintura": {
+          "diferenciais_vs_essential": "Adiciona Pintura efeito R$100/m².",
+          "itens_comuns": [
+            { "nome": "Pintura efeito", "preco_unit": 100.00, "unidade": "m²" },
+            { "nome": "Pintura lisa", "preco_unit": 25.00, "unidade": "m²" }
+          ]
+        },
+
+        "Detalhamento Do Projeto": { "itens_comuns": [{ "nome": "Detalhamento de marmoraria, pontos elétricos e acabamentos", "qtd": 1, "preco_unit": 450.00 }] },
+        "Feltro": { "itens_comuns": [{ "nome": "Aplicação de feltro nos mobiliários", "qtd": 1, "preco_unit": 250.00 }] },
+        "Instalações Elétricas": { "itens_comuns": [{ "nome": "Instalações elétricas", "qtd": 1, "preco_unit": 700.00 }] },
+        "Instalações Hidráulicas": { "dependencia": "Louças E Metais", "itens_comuns": [{ "nome": "Instalações hidráulicas", "qtd": 1, "preco_unit": 550.00 }] },
+        "Instalações Ar-Condicionado": { "itens_comuns": [{ "nome": "Instalação de ar condicionado", "qtd": 1, "preco_unit": 800.00 }] },
+        "Instalações Gerais": { "itens_comuns": [{ "nome": "Instalações gerais", "qtd": 1, "preco_unit": 250.00 }] },
+        "Limpeza": { "itens_comuns": [{ "nome": "Limpeza e arrumação", "qtd": 1, "preco_unit": 450.00 }] },
+        "RRT": { "itens_comuns": [{ "nome": "RRT", "qtd": 1, "preco_unit": 125.40 }] }
+      }
+    },
+
+    "Premium": {
+      "obs": "Ver arquivo bonito_spot_premium.json para todos os itens detalhados por tipologia. Resumo das principais diferenças vs Plus: Marcenaria totalmente replanejada (armário, gabinetes, móveis de banheiro em dupla, vassoureiro). Louças e Metais premium (toalheiro térmico, misturadores de maior valor). TV 50\" (era 43\"). Frigobar 76L. Airfryer. Máquina de café. Chaleira 1,7L. Liquidificador 3,2L. Operacionais para 4 pessoas (2 hóspedes) ou 6 (4 hóspedes). Sem arara — substituída por armário planejado.",
+      "diferenciais_principais": [
+        "TV Smart 50\" (R$3.419 vs 43\" R$2.619)",
+        "Airfryer | Branca 3,5L (R$799 — novo)",
+        "Máquina de café | Branca 1L (R$719 — novo)",
+        "Chaleira Elétrica 1,7L (R$499,90 vs 1,8L R$209,90)",
+        "Liquidificador 3,2L (R$319,90 vs 2,7L R$249,90)",
+        "Frigobar 76L R$2.349 (mesmo do Plus)",
+        "Operacionais expandidos: qtd 4 para 2 hóspedes (vs 3 Essential/Plus)",
+        "Marcenaria totalmente nova: Armário, Cabeceira premium, Gabinetes maiores, 2 Móveis de banheiro",
+        "Cadeira Perlan R$1.399,99 (vs Déco Premium R$899,99 Plus / Thonix R$349,90 Essential)"
+      ],
+      "totais_por_tipologia": {
+        "A": { "valor_produtos": 73263.34, "taxa_decor": 2500.00, "taxa_adm": 9524.23, "total": 85287.57 },
+        "B": { "valor_produtos": 78950.44, "taxa_decor": 4000.00, "taxa_adm": 10263.56, "total": 93214.00 },
+        "C": { "valor_produtos": 81453.64, "taxa_decor": 4000.00, "taxa_adm": 10588.97, "total": 96042.61 },
+        "D": { "valor_produtos": 70433.54, "taxa_decor": 4000.00, "taxa_adm": 9156.36, "total": 83589.90 },
+        "E": { "valor_produtos": 69219.02, "taxa_decor": 3000.00, "taxa_adm": 8998.47, "total": 81217.49 },
+        "F": { "valor_produtos": 70867.02, "taxa_decor": 4000.00, "taxa_adm": 9212.71, "total": 84079.73 }
+      }
+    }
+  },
+
+  "comparativo_evolucao_pacotes": {
+    "Marcenaria": {
+      "Essential": "Arara simples R$400 + Móvel de apoio + Móvel banheiro simples (sem vassoureiro)",
+      "Plus": "Arara planejada R$2.200 + Vassoureiro + Prateleira + Móvel banheiro melhorado R$800 + Gabinete Superior premium R$2.500",
+      "Premium": "Armário planejado (substitui arara) + Cabeceira premium + 2 Móveis de banheiro + Gabinetes premium"
+    },
+    "Eletrodomesticos": {
+      "Essential": "TV 43\" | AC Frio R$2.599 | Frigobar 67L R$1.299 | sem airfryer | sem máquina café",
+      "Plus": "TV 43\" | AC Q/F R$2.999 | Frigobar 76L R$2.349 | Depurador | sem airfryer | sem máquina café",
+      "Premium": "TV 50\" | AC Q/F R$2.999 | Frigobar 76L | Depurador | Airfryer | Máquina de café"
+    },
+    "Mobiliario_cadeira": {
+      "Essential": "Cadeira Thonix R$349,90",
+      "Plus": "Cadeira Déco Premium R$899,99",
+      "Premium": "Cadeira Perlan R$1.399,99"
+    },
+    "Louças": {
+      "Essential": "Cuba Celite | Kit Metais | Porta shampoo de Canto | sem toalheiro térmico",
+      "Plus": "Cuba Roca | sem Kit Metais | Porta sabonete/shampoo | Toalheiro rosto + Toalheiro térmico | Papeleira",
+      "Premium": "Idem Plus com valores unitários maiores (misturadores premium)"
+    },
+    "Decoracao_quadro": {
+      "Essential": "Quadro Moldura Madeira 30x40 (R$95 un)",
+      "Plus": "Quadro Moldura Madeira 50x70 (R$215 un)",
+      "Premium": "Quadro Moldura Madeira 50x70 (R$215 un) — tipologia C usa 30x40"
+    }
+  }
+}
