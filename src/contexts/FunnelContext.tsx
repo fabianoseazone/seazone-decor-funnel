@@ -1,13 +1,14 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
-import { 
-  FunnelState, 
-  Unit, 
-  PackageType, 
-  CustomizationItem, 
+import {
+  FunnelState,
+  Unit,
+  PackageType,
+  CustomizationItem,
   SignatoryData,
-  FUNNEL_STEPS 
+  FUNNEL_STEPS
 } from "@/types/funnel";
 import { customizationItems as defaultCustomizations } from "@/data/mockData";
+import type { Tipologia } from '@/types/catalog';
 
 interface FunnelContextType extends FunnelState {
   setCurrentStep: (step: number) => void;
@@ -21,6 +22,8 @@ interface FunnelContextType extends FunnelState {
   signContract: () => void;
   resetFunnel: () => void;
   getTotalPrice: () => number;
+  tipologiaSelecionada: Tipologia | null;
+  setTipologiaSelecionada: (t: Tipologia | null) => void;
   getCustomizationsTotal: () => number;
   canProceed: () => boolean;
 }
@@ -46,6 +49,7 @@ export function FunnelProvider({ children }: { children: ReactNode }) {
   const [signatoryData, setSignatoryData] = useState<SignatoryData>(defaultSignatory);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [contractSigned, setContractSigned] = useState(false);
+  const [tipologiaSelecionada, setTipologiaSelecionada] = useState<Tipologia | null>(null);
 
   const nextStep = useCallback(() => {
     setCurrentStep(prev => Math.min(prev + 1, FUNNEL_STEPS.length - 1));
@@ -87,6 +91,7 @@ export function FunnelProvider({ children }: { children: ReactNode }) {
     setSignatoryData(defaultSignatory);
     setTermsAccepted(false);
     setContractSigned(false);
+    setTipologiaSelecionada(null);
   }, []);
 
   const getCustomizationsTotal = useCallback(() => {
@@ -96,14 +101,15 @@ export function FunnelProvider({ children }: { children: ReactNode }) {
   }, [customizations]);
 
   const getTotalPrice = useCallback(() => {
-    const packagePrices: Record<PackageType, number> = {
-      essential: 18500,
-      plus: 32000,
-      premium: 52000,
-    };
-    const basePrice = selectedPackage ? packagePrices[selectedPackage] : 0;
-    return basePrice + getCustomizationsTotal();
-  }, [selectedPackage, getCustomizationsTotal]);
+    const produtosTotal = customizations
+      .filter(item => item.selected)
+      .reduce((sum, item) => sum + item.price * (item.quantity ?? 1), 0);
+
+    const decorValor = tipologiaSelecionada?.decor_valor ?? 3000;
+    const admPercent = (tipologiaSelecionada?.adm_percent ?? 13) / 100;
+
+    return produtosTotal + decorValor + admPercent * produtosTotal;
+  }, [customizations, tipologiaSelecionada]);
 
   const canProceed = useCallback((): boolean => {
     switch (currentStep) {
@@ -138,6 +144,8 @@ export function FunnelProvider({ children }: { children: ReactNode }) {
         signContract,
         resetFunnel,
         getTotalPrice,
+        tipologiaSelecionada,
+        setTipologiaSelecionada,
         getCustomizationsTotal,
         canProceed,
       }}

@@ -6,6 +6,8 @@ export interface Unit {
   id: string;
   spot: string;
   deliveryDate: Date;
+  tipologiaCodigo: number | null;       // NEW
+  empreendimentoCodigo: number | null;  // NEW
 }
 
 export interface CustomizationItem {
@@ -13,6 +15,7 @@ export interface CustomizationItem {
   name: string;
   description: string;
   price: number;
+  quantity?: number;  // NEW
   category: "infraestrutura" | "mobiliario" | "tecnologia" | "acabamento";
   selected: boolean;
 }
