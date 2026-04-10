@@ -27,7 +27,8 @@ export function useProdutosTipologia(tipologiaCodigo: number | null): UseProduto
           item_adicional,
           produto:produto_codigo (
             id, codigo, nome, descricao,
-            categoria_codigo, subcategoria_codigo, valor, imagem_url
+            categoria_codigo, subcategoria_codigo, valor, imagem_url,
+            grupo_substituicao_codigo
           )
         `)
         .eq('tipologia_codigo', tipologiaCodigo!)

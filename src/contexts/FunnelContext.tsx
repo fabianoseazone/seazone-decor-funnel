@@ -8,7 +8,7 @@ import {
   FUNNEL_STEPS
 } from "@/types/funnel";
 import { customizationItems as defaultCustomizations } from "@/data/mockData";
-import type { Tipologia } from '@/types/catalog';
+import type { Tipologia, ProdutoTipologia } from '@/types/catalog';
 
 interface FunnelContextType extends FunnelState {
   setCurrentStep: (step: number) => void;
@@ -26,6 +26,15 @@ interface FunnelContextType extends FunnelState {
   setTipologiaSelecionada: (t: Tipologia | null) => void;
   getCustomizationsTotal: () => number;
   canProceed: () => boolean;
+  removidos: Set<number>;
+  toggleRemovido: (produtoCodigo: number) => void;
+  adicionados: Set<number>;
+  toggleAdicionado: (produtoCodigo: number) => void;
+  swaps: Map<number, ProdutoTipologia>;
+  setSwap: (originalCodigo: number, newItem: ProdutoTipologia) => void;
+  clearSwap: (originalCodigo: number) => void;
+  subtotalProdutos: number;
+  setSubtotalProdutos: (n: number) => void;
 }
 
 const defaultSignatory: SignatoryData = {
@@ -50,6 +59,42 @@ export function FunnelProvider({ children }: { children: ReactNode }) {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [contractSigned, setContractSigned] = useState(false);
   const [tipologiaSelecionada, setTipologiaSelecionada] = useState<Tipologia | null>(null);
+  const [removidos, setRemovidos] = useState<Set<number>>(new Set());
+  const [adicionados, setAdicionados] = useState<Set<number>>(new Set());
+  const [swaps, setSwapsState] = useState<Map<number, ProdutoTipologia>>(new Map());
+  const [subtotalProdutos, setSubtotalProdutos] = useState(0);
+
+  const setSwap = useCallback((originalCodigo: number, newItem: ProdutoTipologia) => {
+    setSwapsState(prev => new Map(prev).set(originalCodigo, newItem));
+  }, []);
+
+  const clearSwap = useCallback((originalCodigo: number) => {
+    setSwapsState(prev => { const n = new Map(prev); n.delete(originalCodigo); return n; });
+  }, []);
+
+  const toggleRemovido = useCallback((produtoCodigo: number) => {
+    setRemovidos(prev => {
+      const next = new Set(prev);
+      next.has(produtoCodigo) ? next.delete(produtoCodigo) : next.add(produtoCodigo);
+      return next;
+    });
+  }, []);
+
+  const toggleAdicionado = useCallback((produtoCodigo: number) => {
+    setAdicionados(prev => {
+      const next = new Set(prev);
+      next.has(produtoCodigo) ? next.delete(produtoCodigo) : next.add(produtoCodigo);
+      return next;
+    });
+  }, []);
+
+  const setTipologiaSelecionadaAndReset = useCallback((t: Tipologia | null) => {
+    setTipologiaSelecionada(t);
+    setRemovidos(new Set());
+    setAdicionados(new Set());
+    setSwapsState(new Map());
+    setSubtotalProdutos(0);
+  }, []);
 
   const nextStep = useCallback(() => {
     setCurrentStep(prev => Math.min(prev + 1, FUNNEL_STEPS.length - 1));
@@ -92,6 +137,10 @@ export function FunnelProvider({ children }: { children: ReactNode }) {
     setTermsAccepted(false);
     setContractSigned(false);
     setTipologiaSelecionada(null);
+    setRemovidos(new Set());
+    setAdicionados(new Set());
+    setSwapsState(new Map());
+    setSubtotalProdutos(0);
   }, []);
 
   const getCustomizationsTotal = useCallback(() => {
@@ -101,24 +150,18 @@ export function FunnelProvider({ children }: { children: ReactNode }) {
   }, [customizations]);
 
   const getTotalPrice = useCallback(() => {
-    const produtosTotal = customizations
-      .filter(item => item.selected)
-      .reduce((sum, item) => sum + item.price * (item.quantity ?? 1), 0);
-
-    const decorValor = tipologiaSelecionada?.decor_valor ?? 3000;
-    const admPercent = (tipologiaSelecionada?.adm_percent ?? 13) / 100;
-
-    return produtosTotal + decorValor + admPercent * produtosTotal;
-  }, [customizations, tipologiaSelecionada]);
+    const decorValor = tipologiaSelecionada?.decor_valor ?? 0;
+    const admPercent = (tipologiaSelecionada?.adm_percent ?? 0) / 100;
+    return subtotalProdutos + decorValor + admPercent * subtotalProdutos;
+  }, [subtotalProdutos, tipologiaSelecionada]);
 
   const canProceed = useCallback((): boolean => {
     switch (currentStep) {
       case 0: return selectedPackage !== null;
       case 1: return true; // Customization is optional
-      case 2: return true; // Gallery is informational
-      case 3: return true; // Specs is informational
-      case 4: return true; // Terms review
-      case 5: return termsAccepted && !!signatoryData.name && !!signatoryData.taxId;
+      case 2: return true; // Specs is informational
+      case 3: return true; // Terms review
+      case 4: return termsAccepted && !!signatoryData.name && !!signatoryData.taxId;
       default: return false;
     }
   }, [currentStep, selectedPackage, termsAccepted, signatoryData]);
@@ -145,7 +188,16 @@ export function FunnelProvider({ children }: { children: ReactNode }) {
         resetFunnel,
         getTotalPrice,
         tipologiaSelecionada,
-        setTipologiaSelecionada,
+        setTipologiaSelecionada: setTipologiaSelecionadaAndReset,
+        removidos,
+        toggleRemovido,
+        adicionados,
+        toggleAdicionado,
+        swaps,
+        setSwap,
+        clearSwap,
+        subtotalProdutos,
+        setSubtotalProdutos,
         getCustomizationsTotal,
         canProceed,
       }}

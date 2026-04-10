@@ -22,6 +22,7 @@ export interface Produto {
   subcategoria_codigo: string | null;
   valor: number | null;
   imagem_url: string | null;
+  grupo_substituicao_codigo: number | null;
 }
 
 export interface Tipologia {

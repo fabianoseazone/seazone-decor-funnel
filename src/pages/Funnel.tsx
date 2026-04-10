@@ -4,13 +4,12 @@ import { FunnelStepper } from "@/components/funnel/FunnelStepper";
 import { UnitSelector } from "@/components/funnel/UnitSelector";
 import { StepPackageSelection } from "@/components/funnel/steps/StepPackageSelection";
 import { StepCustomization } from "@/components/funnel/steps/StepCustomization";
-import { StepGallery } from "@/components/funnel/steps/StepGallery";
 import { StepSpecs } from "@/components/funnel/steps/StepSpecs";
 import { StepTerms } from "@/components/funnel/steps/StepTerms";
 import { StepContract } from "@/components/funnel/steps/StepContract";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Building2, MapPin, Calendar } from "lucide-react";
+import { Building2, MapPin, Calendar, ArrowLeft } from "lucide-react";
 
 function FunnelContent() {
   const { currentStep, selectedUnit, getTotalPrice, selectedPackage } = useFunnel();
@@ -24,10 +23,9 @@ function FunnelContent() {
     switch (currentStep) {
       case 0: return <StepPackageSelection />;
       case 1: return <StepCustomization />;
-      case 2: return <StepGallery />;
-      case 3: return <StepSpecs />;
-      case 4: return <StepTerms />;
-      case 5: return <StepContract />;
+      case 2: return <StepSpecs />;
+      case 3: return <StepTerms />;
+      case 4: return <StepContract />;
       default: return <StepPackageSelection />;
     }
   };
@@ -39,6 +37,14 @@ function FunnelContent() {
         <div className="container mx-auto max-w-7xl">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">
+              <a
+                href="/"
+                className="flex items-center gap-1.5 text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Voltar ao site
+              </a>
+              <span className="text-primary-foreground/30">|</span>
               <h1 className="text-xl font-display font-bold text-primary-foreground">
                 Seazone Decor
               </h1>

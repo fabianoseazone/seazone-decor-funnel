@@ -49,17 +49,18 @@ def deduplicate(rows: list[dict]) -> list[dict]:
     return list(seen.values())
 
 
-def upsert(table: str, rows: list[dict]) -> None:
+def upsert(table: str, rows: list[dict], on_conflict: str = "codigo") -> None:
     if not rows:
         print(f"  [skip] {table}: no rows")
         return
     rows = deduplicate(rows)
     batch_size = 200
     total = 0
+    url = f"{SUPABASE_URL}/rest/v1/{table}?on_conflict={on_conflict}"
     for i in range(0, len(rows), batch_size):
         batch = rows[i:i + batch_size]
         resp = requests.post(
-            f"{SUPABASE_URL}/rest/v1/{table}",
+            url,
             headers=HEADERS,
             data=json.dumps(batch),
         )
@@ -234,26 +235,49 @@ def seed_apartamentos():
 
 
 def seed_produto_tipologia():
-    csv_path = DOWNLOADS / "prodxtip.csv"
-    if not csv_path.exists():
-        print(f"  [skip] produto_tipologia: {csv_path} not found.")
-        print("  Export db009_prodxtip from Google Sheets as CSV to that path and re-run.")
-        return
-    print("Seeding produto_tipologia (this may take a while)...")
+    xlsx_path = DOWNLOADS / "db009_prodxtip.xlsx"
+    csv_path  = DOWNLOADS / "prodxtip.csv"
+
     rows = []
-    with open(csv_path, encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
+
+    if xlsx_path.exists():
+        print("Seeding produto_tipologia from xlsx (this may take a while)...")
+        headers, data = read_xlsx(xlsx_path)
+        col = {h: i for i, h in enumerate(headers)}
+        for r in data:
+            if not r[col.get("codigo", 0)]:
+                continue
             rows.append({
-                "codigo":              to_int(row.get("codigo")),
-                "tipologia_codigo":    to_int(row.get("tipologiaCodigo")),
-                "produto_codigo":      to_int(row.get("produtoCodigo")),
-                "quantidade":          to_float(row.get("quantidade")) or 1,
-                "categoria_codigo":    row.get("categoriaCodigo") or None,
-                "subcategoria_codigo": row.get("subcategoriaCodigo") or None,
-                "valor_unitario":      to_float(row.get("valorUnitario")),
-                "item_adicional":      to_bool(row.get("itemAdicional", "FALSE")),
+                "codigo":              to_int(r[col.get("codigo", -1)]),
+                "tipologia_codigo":    to_int(r[col.get("tipologiaCodigo", -1)]),
+                "produto_codigo":      to_int(r[col.get("produtoCodigo", -1)]),
+                "quantidade":          to_float(r[col.get("quantidade", -1)]) or 1,
+                "categoria_codigo":    str(r[col.get("categoriaCodigo", -1)] or "").strip() or None,
+                "subcategoria_codigo": str(r[col.get("subcategoriaCodigo", -1)] or "").strip() or None,
+                "valor_unitario":      to_float(r[col.get("valorUnitario", -1)]),
+                "item_adicional":      to_bool(r[col.get("itemAdicional", -1)] or False),
             })
+
+    elif csv_path.exists():
+        print("Seeding produto_tipologia from csv (this may take a while)...")
+        with open(csv_path, encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                rows.append({
+                    "codigo":              to_int(row.get("codigo")),
+                    "tipologia_codigo":    to_int(row.get("tipologiaCodigo")),
+                    "produto_codigo":      to_int(row.get("produtoCodigo")),
+                    "quantidade":          to_float(row.get("quantidade")) or 1,
+                    "categoria_codigo":    row.get("categoriaCodigo") or None,
+                    "subcategoria_codigo": row.get("subcategoriaCodigo") or None,
+                    "valor_unitario":      to_float(row.get("valorUnitario")),
+                    "item_adicional":      to_bool(row.get("itemAdicional", "FALSE")),
+                })
+
+    else:
+        print(f"  [skip] produto_tipologia: nem {xlsx_path.name} nem {csv_path.name} encontrado.")
+        return
+
     upsert("produto_tipologia", rows)
 
 

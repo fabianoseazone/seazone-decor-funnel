@@ -14,6 +14,28 @@ export type Database = {
   }
   public: {
     Tables: {
+      empreendimento_renders: {
+        Row: {
+          id: number
+          empreendimento_codigo: number
+          pacote_codigo: number
+          ordem: number
+          url: string
+        }
+        Insert: {
+          empreendimento_codigo: number
+          pacote_codigo: number
+          ordem?: number
+          url: string
+        }
+        Update: {
+          empreendimento_codigo?: number
+          pacote_codigo?: number
+          ordem?: number
+          url?: string
+        }
+        Relationships: []
+      }
       empreendimento: {
         Row: {
           id: number
@@ -121,6 +143,20 @@ export type Database = {
         }
         Insert: { tipologia_codigo: number; produto_codigo: number; [key: string]: unknown }
         Update: { quantidade?: number; valor_unitario?: number | null }
+        Relationships: []
+      }
+      grupo_substituicao: {
+        Row: {
+          codigo: number
+          nome: string
+        }
+        Insert: {
+          codigo?: number
+          nome: string
+        }
+        Update: {
+          nome?: string
+        }
         Relationships: []
       }
       simulator_leads: {

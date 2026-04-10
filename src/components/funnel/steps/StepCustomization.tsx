@@ -1,47 +1,249 @@
-import { useState, useCallback } from "react";
-import { Check, Plus, ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
+import { useState, useCallback, useEffect, useMemo } from "react";
+import { ArrowRight, ArrowLeft, Loader2, RefreshCw, X, Search, ArrowLeftRight, Trash2, Plus, RotateCcw } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
+import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useFunnel } from "@/contexts/FunnelContext";
 import { useProdutosTipologia } from "@/hooks/useProdutosTipologia";
+import { useProdutosSubstitutos } from "@/hooks/useProdutosSubstitutos";
 import type { ProdutoTipologia } from "@/types/catalog";
 
-export function StepCustomization() {
-  const { tipologiaSelecionada, nextStep, prevStep } = useFunnel();
-  const [extras, setExtras] = useState<Set<number>>(new Set());
+/** Converts a Google Drive view/share URL to a displayable thumbnail URL. */
+function getDriveImageUrl(url: string | null | undefined): string | null {
+  if (!url) return null;
+  const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (!match) return url; // not a Drive URL, return as-is
+  return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w200`;
+}
 
-  const tipologiaCodigo = tipologiaSelecionada?.codigo ?? null;
-  const { produtosPadrao, produtosAdicionais, isLoading } = useProdutosTipologia(tipologiaCodigo);
+// ─── Substitution Sheet ──────────────────────────────────────────────────────
 
-  const toggleExtra = useCallback((produtoCodigo: number) => {
-    setExtras(prev => {
-      const next = new Set(prev);
-      next.has(produtoCodigo) ? next.delete(produtoCodigo) : next.add(produtoCodigo);
-      return next;
-    });
-  }, []);
+function SubstitutionSheet({
+  item,
+  open,
+  onClose,
+  substitutos,
+  loadingSubstitutos,
+  currentSwap,
+  onSwap,
+  onClearSwap,
+}: {
+  item: ProdutoTipologia | null;
+  open: boolean;
+  onClose: () => void;
+  substitutos: ProdutoTipologia[];
+  loadingSubstitutos: boolean;
+  currentSwap: ProdutoTipologia | undefined;
+  onSwap: (newItem: ProdutoTipologia) => void;
+  onClearSwap: () => void;
+}) {
+  const [search, setSearch] = useState("");
 
-  const calcTotal = () => {
-    const padrao = produtosPadrao.reduce(
-      (sum, p) => sum + (p.valor_unitario ?? 0) * (p.quantidade ?? 1), 0
+  useEffect(() => { if (open) setSearch(""); }, [open]);
+
+  if (!item) return null;
+
+  const currentItem = currentSwap ?? item;
+  const currentPrice = (currentItem.valor_unitario ?? 0) * (currentItem.quantidade ?? 1);
+
+  // Show alternatives from the same grupo_substituicao_codigo (fallback to subcategoria/categoria)
+  const targetGrupo = item.produto?.grupo_substituicao_codigo;
+  const targetSub = item.produto?.subcategoria_codigo;
+  const targetCat = item.produto?.categoria_codigo;
+
+  const alternatives = substitutos.filter(s => {
+    if (s.produto_codigo === currentItem.produto_codigo) return false;
+    if (targetGrupo != null) {
+      // Primary: must be in the same substitution group
+      if (s.produto?.grupo_substituicao_codigo !== targetGrupo) return false;
+    } else if (targetSub) {
+      if (s.produto?.subcategoria_codigo !== targetSub) return false;
+    } else if (targetCat) {
+      if (s.produto?.categoria_codigo !== targetCat) return false;
+    }
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
+    return s.produto?.nome?.toLowerCase().includes(q);
+  });
+
+  const renderAlt = (alt: ProdutoTipologia) => {
+    const altPrice = (alt.valor_unitario ?? 0) * (alt.quantidade ?? 1);
+    const diff = altPrice - currentPrice;
+    return (
+      <div
+        key={alt.id}
+        className="flex items-center gap-3 p-3 rounded-xl border border-border hover:border-seazone-coral/50 hover:bg-seazone-coral/5 cursor-pointer transition-all group"
+        onClick={() => { onSwap(alt); onClose(); }}
+      >
+        {alt.produto?.imagem_url ? (
+          <img src={getDriveImageUrl(alt.produto.imagem_url)!} alt={alt.produto.nome} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+        ) : (
+          <div className="w-10 h-10 rounded-lg bg-secondary flex-shrink-0" />
+        )}
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-foreground truncate">{alt.produto?.nome}</p>
+          <p className="text-xs text-muted-foreground">
+            R$ {altPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            {alt.quantidade > 1 && ` (× ${alt.quantidade})`}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {diff !== 0 && (
+            <span className={`text-xs font-semibold ${diff > 0 ? "text-destructive" : "text-seazone-success"}`}>
+              {diff > 0 ? "+" : ""}R$ {Math.abs(diff).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            </span>
+          )}
+          <ArrowLeftRight className="w-4 h-4 text-muted-foreground group-hover:text-seazone-coral transition-colors" />
+        </div>
+      </div>
     );
-    const adicional = produtosAdicionais
-      .filter(p => extras.has(p.produto_codigo))
-      .reduce((sum, p) => sum + (p.valor_unitario ?? 0) * (p.quantidade ?? 1), 0);
-    const subtotal = padrao + adicional;
-    const decorValor = tipologiaSelecionada?.decor_valor ?? 3000;
-    const admPercent = (tipologiaSelecionada?.adm_percent ?? 13) / 100;
-    return {
-      subtotal,
-      decorValor,
-      admValor: admPercent * subtotal,
-      total: subtotal + decorValor + admPercent * subtotal,
-    };
   };
 
-  const { subtotal, decorValor, admValor, total } = calcTotal();
+  return (
+    <Sheet open={open} onOpenChange={v => { if (!v) onClose(); }}>
+      <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
+        <SheetHeader className="mb-4">
+          <SheetTitle className="font-display">Trocar produto</SheetTitle>
+        </SheetHeader>
+
+        {/* Current item */}
+        <div className="mb-4 p-4 rounded-xl bg-secondary/60 border border-border">
+          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1 font-semibold">Atual</p>
+          <div className="flex items-center gap-3">
+            {currentItem.produto?.imagem_url ? (
+              <img src={getDriveImageUrl(currentItem.produto.imagem_url)!} alt={currentItem.produto?.nome} className="w-10 h-10 rounded-lg object-cover" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+            ) : (
+              <div className="w-10 h-10 rounded-lg bg-muted" />
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-foreground truncate">{currentItem.produto?.nome}</p>
+              <p className="text-sm text-muted-foreground">
+                R$ {currentPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              </p>
+            </div>
+            {currentSwap && (
+              <Button variant="ghost" size="sm" onClick={onClearSwap} className="text-muted-foreground">
+                <X className="w-4 h-4 mr-1" /> Desfazer
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Search */}
+        <div className="relative mb-4">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar produto..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+
+        {loadingSubstitutos ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="w-5 h-5 animate-spin text-seazone-coral" />
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <p className="text-xs font-bold text-seazone-coral uppercase tracking-wider mb-3">
+              Alternativas disponíveis
+            </p>
+            {alternatives.length > 0
+              ? alternatives.map(renderAlt)
+              : (
+                <p className="text-sm text-muted-foreground text-center py-6">
+                  Nenhuma alternativa encontrada nesta categoria.
+                </p>
+              )
+            }
+          </div>
+        )}
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+// ─── StepCustomization ───────────────────────────────────────────────────────
+
+export function StepCustomization() {
+  const {
+    tipologiaSelecionada,
+    nextStep,
+    prevStep,
+    removidos,
+    toggleRemovido,
+    adicionados,
+    toggleAdicionado,
+    swaps,
+    setSwap,
+    clearSwap,
+    setSubtotalProdutos,
+  } = useFunnel();
+
+  const [selectedItem, setSelectedItem] = useState<ProdutoTipologia | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  const tipologiaCodigo = tipologiaSelecionada?.codigo ?? null;
+  const empCodigo = tipologiaSelecionada?.empreendimento_codigo ?? null;
+  const tipoLetra = tipologiaSelecionada?.tipo_letra ?? null;
+
+  const { produtosPadrao, produtosAdicionais, isLoading } = useProdutosTipologia(tipologiaCodigo);
+  const { data: substitutos = [], isLoading: loadingSubstitutos } = useProdutosSubstitutos(empCodigo, tipoLetra);
+
+  // Active standard items: not removed, with swaps applied
+  const activeItems = useMemo(() =>
+    produtosPadrao
+      .filter(p => !removidos.has(p.produto_codigo))
+      .map(p => swaps.has(p.produto_codigo) ? { ...p, ...swaps.get(p.produto_codigo)!, _originalCodigo: p.produto_codigo } : p),
+    [produtosPadrao, removidos, swaps]
+  );
+
+  // Removed standard items (for restore section)
+  const removidosList = useMemo(() =>
+    produtosPadrao.filter(p => removidos.has(p.produto_codigo)),
+    [produtosPadrao, removidos]
+  );
+
+  // Added optional items
+  const adicionadosList = useMemo(() =>
+    produtosAdicionais.filter(p => adicionados.has(p.produto_codigo)),
+    [produtosAdicionais, adicionados]
+  );
+
+  // Subtotal → context (for header): active standard + added optional
+  const subtotal = useMemo(() => {
+    const stdTotal = activeItems.reduce((sum, p) => sum + (p.valor_unitario ?? 0) * (p.quantidade ?? 1), 0);
+    const addTotal = adicionadosList.reduce((sum, p) => sum + (p.valor_unitario ?? 0) * (p.quantidade ?? 1), 0);
+    return stdTotal + addTotal;
+  }, [activeItems, adicionadosList]);
+
+  useEffect(() => { setSubtotalProdutos(subtotal); }, [subtotal, setSubtotalProdutos]);
+
+  const decorValor = tipologiaSelecionada?.decor_valor ?? 0;
+  const admPercent = (tipologiaSelecionada?.adm_percent ?? 0) / 100;
+  const admValor = admPercent * subtotal;
+  const total = subtotal + decorValor + admValor;
+
+  const openSwap = useCallback((item: ProdutoTipologia) => {
+    setSelectedItem(item);
+    setSheetOpen(true);
+  }, []);
+
+  const handleSwap = useCallback((newItem: ProdutoTipologia) => {
+    if (!selectedItem) return;
+    const originalCodigo = (selectedItem as any)._originalCodigo ?? selectedItem.produto_codigo;
+    setSwap(originalCodigo, newItem);
+  }, [selectedItem, setSwap]);
+
+  const handleClearSwap = useCallback(() => {
+    if (!selectedItem) return;
+    const originalCodigo = (selectedItem as any)._originalCodigo ?? selectedItem.produto_codigo;
+    clearSwap(originalCodigo);
+    setSheetOpen(false);
+  }, [selectedItem, clearSwap]);
 
   if (isLoading) {
     return (
@@ -51,127 +253,194 @@ export function StepCustomization() {
     );
   }
 
-  const renderProduct = (item: ProdutoTipologia, isExtra: boolean) => {
-    const selected = isExtra ? extras.has(item.produto_codigo) : true;
-    const categoria = item.produto?.subcategoria_codigo ?? item.produto?.categoria_codigo;
-    return (
-      <Card
-        key={item.id}
-        variant={selected ? "selected" : "elevated"}
-        className={`transition-all duration-200 ${isExtra ? "cursor-pointer" : ""}`}
-        onClick={isExtra ? () => toggleExtra(item.produto_codigo) : undefined}
-      >
-        <CardContent className="p-4">
-          <div className="flex items-start gap-4">
-            {item.produto?.imagem_url ? (
-              <img
-                src={item.produto.imagem_url}
-                alt={item.produto.nome}
-                className="w-12 h-12 rounded-xl object-cover flex-shrink-0"
-              />
-            ) : (
-              <div className="w-12 h-12 rounded-xl bg-secondary flex-shrink-0" />
-            )}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between mb-1">
-                <h4 className="font-semibold text-foreground truncate">
-                  {item.produto?.nome ?? `Produto ${item.produto_codigo}`}
-                </h4>
-                {isExtra ? (
-                  <Switch
-                    checked={selected}
-                    onCheckedChange={() => toggleExtra(item.produto_codigo)}
-                    onClick={(e) => e.stopPropagation()}
-                  />
-                ) : (
-                  <Badge variant="secondary" className="text-xs">Incluído</Badge>
-                )}
-              </div>
-              {item.produto?.descricao && (
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {item.produto.descricao}
-                </p>
-              )}
-              <div className="mt-2 flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">
-                  Qtd: {item.quantidade}{categoria ? ` · ${categoria}` : ""}
-                </span>
-                <span className={`font-bold text-sm ${
-                  isExtra && selected ? "text-seazone-coral" : "text-foreground"
-                }`}>
-                  R$ {((item.valor_unitario ?? 0) * (item.quantidade ?? 1)).toLocaleString("pt-BR", {
-                    minimumFractionDigits: 2
-                  })}
-                </span>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  };
+  // Group active items by subcategoria
+  const groups = activeItems.reduce<Record<string, typeof activeItems>>((acc, p) => {
+    const key = (p as any).produto?.subcategoria_codigo ?? (p as any).produto?.categoria_codigo ?? "Outros";
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(p);
+    return acc;
+  }, {});
+
+  const currentSwapForSelected = selectedItem
+    ? swaps.get((selectedItem as any)._originalCodigo ?? selectedItem.produto_codigo)
+    : undefined;
 
   return (
-    <div className="space-y-8 pb-48">
+    <div className="space-y-6 pb-48">
       <div className="text-center">
         <h2 className="text-3xl font-display font-bold text-foreground mb-2">
-          Produtos do Plano
+          Personalizar Produtos
         </h2>
         <p className="text-muted-foreground">
-          Itens incluídos e opções de personalização para sua unidade
+          Clique em qualquer item para trocar por uma alternativa
         </p>
       </div>
 
-      {produtosPadrao.length > 0 && (
-        <div className="space-y-4">
-          <h3 className="font-semibold text-lg flex items-center gap-2">
-            <Check className="w-5 h-5 text-seazone-success" />
-            Itens Incluídos ({produtosPadrao.length})
-          </h3>
-          <div className="grid md:grid-cols-2 gap-4">
-            {produtosPadrao.map(item => renderProduct(item, false))}
+      {/* Summary badges */}
+      <div className="flex flex-wrap gap-2 justify-center">
+        <Badge variant="secondary">{activeItems.length} itens incluídos</Badge>
+        {removidosList.length > 0 && <Badge variant="outline">{removidosList.length} removido{removidosList.length > 1 ? "s" : ""}</Badge>}
+        {adicionadosList.length > 0 && <Badge variant="coral">+{adicionadosList.length} adicionado{adicionadosList.length > 1 ? "s" : ""}</Badge>}
+        {swaps.size > 0 && <Badge variant="coral">{swaps.size} substituído{swaps.size > 1 ? "s" : ""}</Badge>}
+      </div>
+
+      {/* Active product groups */}
+      {Object.entries(groups).map(([categoria, items]) => (
+        <div key={categoria} className="space-y-3">
+          <h3 className="text-xs font-bold text-seazone-coral uppercase tracking-wider">{categoria}</h3>
+          <div className="grid md:grid-cols-2 gap-3">
+            {items.map((item: any) => {
+              const isSwapped = swaps.has(item._originalCodigo ?? item.produto_codigo);
+              const price = (item.valor_unitario ?? 0) * (item.quantidade ?? 1);
+              return (
+                <Card key={item.id} variant="elevated" className="hover:border-seazone-coral/40 transition-all group">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      {item.produto?.imagem_url ? (
+                        <img src={getDriveImageUrl(item.produto.imagem_url)!} alt={item.produto.nome} className="w-12 h-12 rounded-xl object-cover flex-shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                      ) : (
+                        <div className="w-12 h-12 rounded-xl bg-secondary flex-shrink-0" />
+                      )}
+                      <div className="flex-1 min-w-0 cursor-pointer" onClick={() => openSwap(item)}>
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <p className="font-semibold text-foreground text-sm leading-tight">
+                            {item.produto?.nome ?? `Produto ${item.produto_codigo}`}
+                          </p>
+                          {isSwapped && <Badge variant="coral" className="text-[10px] flex-shrink-0">Trocado</Badge>}
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">Qtd: {item.quantidade}</span>
+                          <span className="text-sm font-bold text-foreground">
+                            R$ {price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                      </div>
+                      {/* Actions */}
+                      <div className="flex flex-col gap-1 flex-shrink-0">
+                        <button onClick={() => openSwap(item)} className="p-1.5 rounded-lg hover:bg-seazone-coral/10 text-muted-foreground hover:text-seazone-coral transition-colors" title="Trocar">
+                          <RefreshCw className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => toggleRemovido(item._originalCodigo ?? item.produto_codigo)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors" title="Remover">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+
+      {/* Removed items — restore */}
+      {removidosList.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Itens removidos</h3>
+          <div className="grid md:grid-cols-2 gap-3">
+            {removidosList.map(item => (
+              <Card key={item.id} variant="elevated" className="opacity-60">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    {item.produto?.imagem_url ? (
+                      <img src={getDriveImageUrl(item.produto.imagem_url)!} alt={item.produto?.nome ?? ""} className="w-12 h-12 rounded-xl object-cover flex-shrink-0 grayscale" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                    ) : (
+                      <div className="w-12 h-12 rounded-xl bg-secondary flex-shrink-0" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm line-through text-muted-foreground">
+                        {item.produto?.nome ?? `Produto ${item.produto_codigo}`}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        R$ {((item.valor_unitario ?? 0) * (item.quantidade ?? 1)).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                      </p>
+                    </div>
+                    <button onClick={() => toggleRemovido(item.produto_codigo)} className="p-1.5 rounded-lg hover:bg-seazone-coral/10 text-muted-foreground hover:text-seazone-coral transition-colors flex-shrink-0" title="Restaurar">
+                      <RotateCcw className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       )}
 
+      {/* Optional items — add */}
       {produtosAdicionais.length > 0 && (
-        <div className="space-y-4">
-          <h3 className="font-semibold text-lg flex items-center gap-2">
-            <Plus className="w-5 h-5 text-seazone-coral" />
-            Itens Adicionais ({extras.size} selecionados)
-          </h3>
-          <div className="grid md:grid-cols-2 gap-4">
-            {produtosAdicionais.map(item => renderProduct(item, true))}
+        <div className="space-y-3">
+          <h3 className="text-xs font-bold text-seazone-coral uppercase tracking-wider">Itens opcionais disponíveis</h3>
+          <div className="grid md:grid-cols-2 gap-3">
+            {produtosAdicionais.map(item => {
+              const isAdded = adicionados.has(item.produto_codigo);
+              const price = (item.valor_unitario ?? 0) * (item.quantidade ?? 1);
+              return (
+                <Card key={item.id} variant="elevated" className={`transition-all ${isAdded ? "border-seazone-coral/40" : ""}`}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      {item.produto?.imagem_url ? (
+                        <img src={getDriveImageUrl(item.produto.imagem_url)!} alt={item.produto?.nome ?? ""} className="w-12 h-12 rounded-xl object-cover flex-shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                      ) : (
+                        <div className="w-12 h-12 rounded-xl bg-secondary flex-shrink-0" />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm text-foreground">{item.produto?.nome ?? `Produto ${item.produto_codigo}`}</p>
+                        <p className="text-xs text-muted-foreground">Qtd: {item.quantidade}</p>
+                        <p className="text-sm font-bold text-foreground">R$ {price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</p>
+                      </div>
+                      <button
+                        onClick={() => toggleAdicionado(item.produto_codigo)}
+                        className={`p-2 rounded-lg transition-colors flex-shrink-0 ${isAdded ? "bg-seazone-coral/10 text-seazone-coral hover:bg-destructive/10 hover:text-destructive" : "bg-secondary hover:bg-seazone-coral/10 text-muted-foreground hover:text-seazone-coral"}`}
+                        title={isAdded ? "Remover" : "Adicionar"}
+                      >
+                        {isAdded ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
       )}
 
+      {/* Substitution Sheet */}
+      <SubstitutionSheet
+        item={selectedItem}
+        open={sheetOpen}
+        onClose={() => setSheetOpen(false)}
+        substitutos={substitutos}
+        loadingSubstitutos={loadingSubstitutos}
+        currentSwap={currentSwapForSelected}
+        onSwap={handleSwap}
+        onClearSwap={handleClearSwap}
+      />
+
+      {/* Sticky bottom bar */}
       <Card variant="navy" className="fixed bottom-0 left-0 right-0 z-50 rounded-none">
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 container mx-auto max-w-7xl">
-            <div className="space-y-1 text-sm">
-              <div className="flex gap-6">
-                <span className="text-primary-foreground/60">Produtos:</span>
+            <div className="flex gap-6 text-sm flex-wrap">
+              <div>
+                <span className="text-primary-foreground/60">Produtos: </span>
                 <span className="text-primary-foreground font-medium">
                   R$ {subtotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                 </span>
               </div>
-              <div className="flex gap-6">
-                <span className="text-primary-foreground/60">Decor:</span>
+              <div>
+                <span className="text-primary-foreground/60">Decor: </span>
                 <span className="text-primary-foreground font-medium">
                   R$ {decorValor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                 </span>
               </div>
-              <div className="flex gap-6">
-                <span className="text-primary-foreground/60">
-                  Adm ({tipologiaSelecionada?.adm_percent ?? 13}%):
-                </span>
+              <div>
+                <span className="text-primary-foreground/60">Adm ({tipologiaSelecionada?.adm_percent ?? 0}%): </span>
                 <span className="text-primary-foreground font-medium">
                   R$ {admValor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                 </span>
               </div>
-              <div className="flex gap-6 border-t border-primary-foreground/20 pt-1">
-                <span className="text-primary-foreground/60 font-semibold">Total:</span>
+              <div className="border-l border-primary-foreground/20 pl-6">
+                <span className="text-primary-foreground/60 font-semibold">Total: </span>
                 <span className="text-2xl font-bold text-seazone-coral">
                   R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                 </span>

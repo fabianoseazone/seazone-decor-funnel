@@ -59,10 +59,9 @@ export interface FunnelState {
   contractSigned: boolean;
 }
 
-export type FunnelStep = 
+export type FunnelStep =
   | "package"
   | "customization"
-  | "gallery"
   | "specs"
   | "terms"
   | "contract";
@@ -70,8 +69,7 @@ export type FunnelStep =
 export const FUNNEL_STEPS: { id: FunnelStep; label: string; shortLabel: string }[] = [
   { id: "package", label: "Escolha do Pacote", shortLabel: "Pacote" },
   { id: "customization", label: "Personalização", shortLabel: "Itens" },
-  { id: "gallery", label: "Galeria de Renders", shortLabel: "Renders" },
-  { id: "specs", label: "Memorial Descritivo", shortLabel: "Specs" },
+  { id: "specs", label: "Memorial Descritivo", shortLabel: "Memorial" },
   { id: "terms", label: "Condições Comerciais", shortLabel: "Termos" },
   { id: "contract", label: "Assinatura do Contrato", shortLabel: "Contrato" },
 ];

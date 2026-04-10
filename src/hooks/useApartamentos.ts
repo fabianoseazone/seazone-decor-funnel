@@ -13,7 +13,13 @@ export function useApartamentos(empreendimentoCodigo: number | null) {
         .eq('empreendimento_codigo', empreendimentoCodigo!)
         .order('apartamento_id');
       if (error) throw error;
-      return data as Apartamento[];
+      // Deduplicate by apartamento_id — each unit may have one row per package
+      const seen = new Set<string>();
+      return (data as Apartamento[]).filter((a) => {
+        if (seen.has(a.apartamento_id)) return false;
+        seen.add(a.apartamento_id);
+        return true;
+      });
     },
   });
 }

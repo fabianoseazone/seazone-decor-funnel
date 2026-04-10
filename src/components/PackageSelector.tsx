@@ -1,9 +1,8 @@
 import { useState, useCallback, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { Check, X, Star, TrendingUp, Ruler, ClipboardList, Wrench, Sparkles, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { DesignComparison } from "@/components/DesignComparison";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { InvestmentSimulator } from "@/components/InvestmentSimulator";
 import spotLogo from "@/assets/spot-logo.png";
 import packageEssential from "@/assets/package-essential.jpg";
 import packagePlus from "@/assets/package-plus.jpg";
@@ -125,7 +124,7 @@ interface PackageSelectorProps {
 
 export function PackageSelector({ onViewDetails }: PackageSelectorProps) {
   const [activePackage, setActivePackage] = useState<PackageType>("essential");
-  const [simulatorOpen, setSimulatorOpen] = useState(false);
+  const navigate = useNavigate();
 
   const packageOrder: PackageType[] = ["essential", "plus", "premium"];
   const activeIndex = packageOrder.indexOf(activePackage);
@@ -405,7 +404,7 @@ export function PackageSelector({ onViewDetails }: PackageSelectorProps) {
                   </div>
                 </div>
                 <button
-                  onClick={() => setSimulatorOpen(true)}
+                  onClick={() => navigate("/funnel")}
                   className="group relative inline-flex items-center gap-3 bg-seazone-coral hover:bg-seazone-coral/90 text-white font-bold text-base md:text-lg px-8 py-4 md:px-10 md:py-5 rounded-xl shadow-coral hover:shadow-lg transition-all duration-300 hover:scale-[1.03] whitespace-nowrap"
                 >
                   <TrendingUp className="w-5 h-5 transition-transform group-hover:translate-x-0.5" />
@@ -413,14 +412,6 @@ export function PackageSelector({ onViewDetails }: PackageSelectorProps) {
                 </button>
               </div>
             </div>
-
-            {/* Simulator Dialog */}
-            <Dialog open={simulatorOpen} onOpenChange={setSimulatorOpen}>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 gap-0 border-0 bg-transparent shadow-none [&>button]:z-20">
-                <DialogTitle className="sr-only">Simulador de Investimento</DialogTitle>
-                <InvestmentSimulator />
-              </DialogContent>
-            </Dialog>
           </div>
         </div>
       </div>
