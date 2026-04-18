@@ -25,9 +25,7 @@ function ProductList({ tipologiaCodigo }: { tipologiaCodigo: number }) {
   const { setSubtotalProdutos } = useFunnel();
 
   useEffect(() => {
-    const total = produtosPadrao.reduce(
-      (sum, p) => sum + (p.valor_unitario ?? 0) * (p.quantidade ?? 1), 0
-    );
+    const total = produtosPadrao.reduce((sum, p) => sum + (p.valor_unitario ?? 0) * (p.quantidade ?? 1), 0);
     setSubtotalProdutos(total);
   }, [produtosPadrao, setSubtotalProdutos]);
 
@@ -54,18 +52,11 @@ function ProductList({ tipologiaCodigo }: { tipologiaCodigo: number }) {
     return acc;
   }, {});
 
-  const total = produtosPadrao.reduce(
-    (sum, p) => sum + (p.valor_unitario ?? 0) * (p.quantidade ?? 1), 0
-  );
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <span className="text-sm font-semibold text-foreground">
           {produtosPadrao.length} itens incluídos
-        </span>
-        <span className="text-sm font-bold text-foreground">
-          R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
         </span>
       </div>
 
@@ -100,9 +91,6 @@ function ProductList({ tipologiaCodigo }: { tipologiaCodigo: number }) {
                       {(item.quantidade ?? 1) > 1 && (
                         <span className="text-muted-foreground ml-1">× {item.quantidade}</span>
                       )}
-                    </span>
-                    <span className="font-medium whitespace-nowrap text-muted-foreground">
-                      R$ {((item.valor_unitario ?? 0) * (item.quantidade ?? 1)).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                     </span>
                   </div>
                 );
@@ -309,10 +297,6 @@ function PackageCard({ tip, isSelected, onSelect }: {
   const nome = PACOTE_LABEL[abrev] ?? tip.descricao;
   const { produtosPadrao, isLoading: loadingProdutos } = useProdutosTipologia(tip.codigo);
 
-  const totalProdutos = produtosPadrao.reduce(
-    (sum, p) => sum + (p.valor_unitario ?? 0) * (p.quantidade ?? 1), 0
-  );
-
   return (
     <Card
       variant={isSelected ? "selected" : "elevated"}
@@ -339,13 +323,7 @@ function PackageCard({ tip, isSelected, onSelect }: {
           {loadingProdutos ? (
             <Loader2 className="w-4 h-4 animate-spin mx-auto text-muted-foreground" />
           ) : (
-            <>
-              <p className="text-xs text-muted-foreground mb-0.5">Valor dos produtos</p>
-              <p className="text-2xl font-bold text-foreground">
-                R$ {totalProdutos.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-              </p>
-              <p className="text-xs text-muted-foreground mt-0.5">{produtosPadrao.length} itens incluídos</p>
-            </>
+            <p className="text-sm font-semibold text-foreground py-1">{produtosPadrao.length} itens incluídos</p>
           )}
         </div>
 

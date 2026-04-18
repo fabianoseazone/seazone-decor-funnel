@@ -69,34 +69,25 @@ function SubstitutionSheet({
   });
 
   const renderAlt = (alt: ProdutoTipologia) => {
-    const altPrice = (alt.valor_unitario ?? 0) * (alt.quantidade ?? 1);
-    const diff = altPrice - currentPrice;
+    const imgUrl = getDriveImageUrl(alt.produto?.imagem_url);
     return (
       <div
         key={alt.id}
         className="flex items-center gap-3 p-3 rounded-xl border border-border hover:border-seazone-coral/50 hover:bg-seazone-coral/5 cursor-pointer transition-all group"
         onClick={() => { onSwap(alt); onClose(); }}
       >
-        {alt.produto?.imagem_url ? (
-          <img src={getDriveImageUrl(alt.produto.imagem_url)!} alt={alt.produto.nome} className="w-10 h-10 rounded-lg object-cover flex-shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+        {imgUrl ? (
+          <img src={imgUrl} alt={alt.produto?.nome ?? ""} className="w-16 h-16 rounded-xl object-cover flex-shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
         ) : (
-          <div className="w-10 h-10 rounded-lg bg-secondary flex-shrink-0" />
+          <div className="w-16 h-16 rounded-xl bg-secondary flex-shrink-0" />
         )}
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-foreground truncate">{alt.produto?.nome}</p>
-          <p className="text-xs text-muted-foreground">
-            R$ {altPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-            {alt.quantidade > 1 && ` (× ${alt.quantidade})`}
-          </p>
-        </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
-          {diff !== 0 && (
-            <span className={`text-xs font-semibold ${diff > 0 ? "text-destructive" : "text-seazone-success"}`}>
-              {diff > 0 ? "+" : ""}R$ {Math.abs(diff).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-            </span>
+          <p className="text-sm font-medium text-foreground">{alt.produto?.nome}</p>
+          {alt.quantidade > 1 && (
+            <p className="text-xs text-muted-foreground">Qtd: {alt.quantidade}</p>
           )}
-          <ArrowLeftRight className="w-4 h-4 text-muted-foreground group-hover:text-seazone-coral transition-colors" />
         </div>
+        <ArrowLeftRight className="w-5 h-5 text-muted-foreground group-hover:text-seazone-coral transition-colors flex-shrink-0" />
       </div>
     );
   };
@@ -110,21 +101,21 @@ function SubstitutionSheet({
 
         {/* Current item */}
         <div className="mb-4 p-4 rounded-xl bg-secondary/60 border border-border">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1 font-semibold">Atual</p>
-          <div className="flex items-center gap-3">
+          <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2 font-semibold">Item atual</p>
+          <div className="flex items-center gap-4">
             {currentItem.produto?.imagem_url ? (
-              <img src={getDriveImageUrl(currentItem.produto.imagem_url)!} alt={currentItem.produto?.nome} className="w-10 h-10 rounded-lg object-cover" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+              <img src={getDriveImageUrl(currentItem.produto.imagem_url)!} alt={currentItem.produto?.nome} className="w-20 h-20 rounded-xl object-cover flex-shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
             ) : (
-              <div className="w-10 h-10 rounded-lg bg-muted" />
+              <div className="w-20 h-20 rounded-xl bg-muted flex-shrink-0" />
             )}
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-foreground truncate">{currentItem.produto?.nome}</p>
-              <p className="text-sm text-muted-foreground">
-                R$ {currentPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-              </p>
+              <p className="font-semibold text-foreground">{currentItem.produto?.nome}</p>
+              {currentItem.quantidade > 1 && (
+                <p className="text-sm text-muted-foreground">Qtd: {currentItem.quantidade}</p>
+              )}
             </div>
             {currentSwap && (
-              <Button variant="ghost" size="sm" onClick={onClearSwap} className="text-muted-foreground">
+              <Button variant="ghost" size="sm" onClick={onClearSwap} className="text-muted-foreground flex-shrink-0">
                 <X className="w-4 h-4 mr-1" /> Desfazer
               </Button>
             )}
@@ -295,33 +286,33 @@ export function StepCustomization() {
               return (
                 <Card key={item.id} variant="elevated" className="hover:border-seazone-coral/40 transition-all group">
                   <CardContent className="p-4">
-                    <div className="flex items-center gap-3">
-                      {item.produto?.imagem_url ? (
-                        <img src={getDriveImageUrl(item.produto.imagem_url)!} alt={item.produto.nome} className="w-12 h-12 rounded-xl object-cover flex-shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                      ) : (
-                        <div className="w-12 h-12 rounded-xl bg-secondary flex-shrink-0" />
-                      )}
+                    <div className="flex items-start gap-3">
+                      <div
+                        className="flex-shrink-0 cursor-pointer"
+                        onClick={() => openSwap(item)}
+                      >
+                        {item.produto?.imagem_url ? (
+                          <img src={getDriveImageUrl(item.produto.imagem_url)!} alt={item.produto.nome} className="w-20 h-20 rounded-xl object-cover" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                        ) : (
+                          <div className="w-20 h-20 rounded-xl bg-secondary" />
+                        )}
+                      </div>
                       <div className="flex-1 min-w-0 cursor-pointer" onClick={() => openSwap(item)}>
-                        <div className="flex items-start justify-between gap-2 mb-1">
-                          <p className="font-semibold text-foreground text-sm leading-tight">
+                        <div className="flex items-start gap-2 mb-1">
+                          <p className="font-semibold text-foreground text-sm leading-tight flex-1">
                             {item.produto?.nome ?? `Produto ${item.produto_codigo}`}
                           </p>
-                          {isSwapped && <Badge variant="coral" className="text-[10px] flex-shrink-0">Trocado</Badge>}
+                          {isSwapped && <Badge variant="coral" className="text-[10px] flex-shrink-0">Personalizado</Badge>}
                         </div>
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs text-muted-foreground">Qtd: {item.quantidade}</span>
-                          <span className="text-sm font-bold text-foreground">
-                            R$ {price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                          </span>
-                        </div>
+                        <span className="text-xs text-muted-foreground">Qtd: {item.quantidade}</span>
                       </div>
                       {/* Actions */}
-                      <div className="flex flex-col gap-1 flex-shrink-0">
-                        <button onClick={() => openSwap(item)} className="p-1.5 rounded-lg hover:bg-seazone-coral/10 text-muted-foreground hover:text-seazone-coral transition-colors" title="Trocar">
-                          <RefreshCw className="w-3.5 h-3.5" />
+                      <div className="flex flex-col gap-2 flex-shrink-0">
+                        <button onClick={() => openSwap(item)} className="p-2 rounded-lg hover:bg-seazone-coral/10 text-muted-foreground hover:text-seazone-coral transition-colors" title="Trocar">
+                          <RefreshCw className="w-5 h-5" />
                         </button>
-                        <button onClick={() => toggleRemovido(item._originalCodigo ?? item.produto_codigo)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors" title="Remover">
-                          <Trash2 className="w-3.5 h-3.5" />
+                        <button onClick={() => toggleRemovido(item._originalCodigo ?? item.produto_codigo)} className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors" title="Remover">
+                          <Trash2 className="w-5 h-5" />
                         </button>
                       </div>
                     </div>
@@ -343,20 +334,18 @@ export function StepCustomization() {
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
                     {item.produto?.imagem_url ? (
-                      <img src={getDriveImageUrl(item.produto.imagem_url)!} alt={item.produto?.nome ?? ""} className="w-12 h-12 rounded-xl object-cover flex-shrink-0 grayscale" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                      <img src={getDriveImageUrl(item.produto.imagem_url)!} alt={item.produto?.nome ?? ""} className="w-16 h-16 rounded-xl object-cover flex-shrink-0 grayscale" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                     ) : (
-                      <div className="w-12 h-12 rounded-xl bg-secondary flex-shrink-0" />
+                      <div className="w-16 h-16 rounded-xl bg-secondary flex-shrink-0" />
                     )}
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-sm line-through text-muted-foreground">
                         {item.produto?.nome ?? `Produto ${item.produto_codigo}`}
                       </p>
-                      <p className="text-xs text-muted-foreground">
-                        R$ {((item.valor_unitario ?? 0) * (item.quantidade ?? 1)).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                      </p>
+                      <p className="text-xs text-muted-foreground">Qtd: {item.quantidade}</p>
                     </div>
-                    <button onClick={() => toggleRemovido(item.produto_codigo)} className="p-1.5 rounded-lg hover:bg-seazone-coral/10 text-muted-foreground hover:text-seazone-coral transition-colors flex-shrink-0" title="Restaurar">
-                      <RotateCcw className="w-3.5 h-3.5" />
+                    <button onClick={() => toggleRemovido(item.produto_codigo)} className="p-2 rounded-lg hover:bg-seazone-coral/10 text-muted-foreground hover:text-seazone-coral transition-colors flex-shrink-0" title="Restaurar">
+                      <RotateCcw className="w-5 h-5" />
                     </button>
                   </div>
                 </CardContent>
@@ -373,27 +362,25 @@ export function StepCustomization() {
           <div className="grid md:grid-cols-2 gap-3">
             {produtosAdicionais.map(item => {
               const isAdded = adicionados.has(item.produto_codigo);
-              const price = (item.valor_unitario ?? 0) * (item.quantidade ?? 1);
               return (
                 <Card key={item.id} variant="elevated" className={`transition-all ${isAdded ? "border-seazone-coral/40" : ""}`}>
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3">
                       {item.produto?.imagem_url ? (
-                        <img src={getDriveImageUrl(item.produto.imagem_url)!} alt={item.produto?.nome ?? ""} className="w-12 h-12 rounded-xl object-cover flex-shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                        <img src={getDriveImageUrl(item.produto.imagem_url)!} alt={item.produto?.nome ?? ""} className="w-20 h-20 rounded-xl object-cover flex-shrink-0" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                       ) : (
-                        <div className="w-12 h-12 rounded-xl bg-secondary flex-shrink-0" />
+                        <div className="w-20 h-20 rounded-xl bg-secondary flex-shrink-0" />
                       )}
                       <div className="flex-1 min-w-0">
                         <p className="font-semibold text-sm text-foreground">{item.produto?.nome ?? `Produto ${item.produto_codigo}`}</p>
                         <p className="text-xs text-muted-foreground">Qtd: {item.quantidade}</p>
-                        <p className="text-sm font-bold text-foreground">R$ {price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</p>
                       </div>
                       <button
                         onClick={() => toggleAdicionado(item.produto_codigo)}
-                        className={`p-2 rounded-lg transition-colors flex-shrink-0 ${isAdded ? "bg-seazone-coral/10 text-seazone-coral hover:bg-destructive/10 hover:text-destructive" : "bg-secondary hover:bg-seazone-coral/10 text-muted-foreground hover:text-seazone-coral"}`}
+                        className={`p-2.5 rounded-lg transition-colors flex-shrink-0 ${isAdded ? "bg-seazone-coral/10 text-seazone-coral hover:bg-destructive/10 hover:text-destructive" : "bg-secondary hover:bg-seazone-coral/10 text-muted-foreground hover:text-seazone-coral"}`}
                         title={isAdded ? "Remover" : "Adicionar"}
                       >
-                        {isAdded ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                        {isAdded ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
                       </button>
                     </div>
                   </CardContent>
@@ -419,32 +406,12 @@ export function StepCustomization() {
       {/* Sticky bottom bar */}
       <Card variant="navy" className="fixed bottom-0 left-0 right-0 z-50 rounded-none">
         <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 container mx-auto max-w-7xl">
-            <div className="flex gap-6 text-sm flex-wrap">
-              <div>
-                <span className="text-primary-foreground/60">Produtos: </span>
-                <span className="text-primary-foreground font-medium">
-                  R$ {subtotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                </span>
-              </div>
-              <div>
-                <span className="text-primary-foreground/60">Decor: </span>
-                <span className="text-primary-foreground font-medium">
-                  R$ {decorValor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                </span>
-              </div>
-              <div>
-                <span className="text-primary-foreground/60">Adm ({tipologiaSelecionada?.adm_percent ?? 0}%): </span>
-                <span className="text-primary-foreground font-medium">
-                  R$ {admValor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                </span>
-              </div>
-              <div className="border-l border-primary-foreground/20 pl-6">
-                <span className="text-primary-foreground/60 font-semibold">Total: </span>
-                <span className="text-2xl font-bold text-seazone-coral">
-                  R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                </span>
-              </div>
+          <div className="flex items-center justify-between gap-4 container mx-auto max-w-7xl">
+            <div>
+              <span className="text-primary-foreground/60 text-sm">Total estimado: </span>
+              <span className="text-2xl font-bold text-seazone-coral">
+                R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              </span>
             </div>
             <div className="flex gap-3">
               <Button variant="glass" onClick={prevStep}>

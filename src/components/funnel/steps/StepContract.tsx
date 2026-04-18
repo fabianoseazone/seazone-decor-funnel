@@ -1,281 +1,244 @@
 import { useState } from "react";
-import { ArrowLeft, Download, FileText, Check, Sparkles, PartyPopper } from "lucide-react";
+import { ArrowLeft, Download, Send, CheckCircle2, Building2, MapPin, Package } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useFunnel } from "@/contexts/FunnelContext";
-import { packagesData } from "@/data/mockData";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+const PACOTE_LABEL: Record<string, string> = {
+  essential: "Essential",
+  plus: "Plus",
+  premium: "Premium",
+};
+
 export function StepContract() {
-  const { 
-    selectedUnit, 
-    selectedPackage, 
-    signatoryData, 
-    updateSignatory, 
-    termsAccepted, 
-    setTermsAccepted,
-    contractSigned,
-    signContract,
+  const {
+    selectedUnit,
+    selectedPackage,
+    tipologiaSelecionada,
     getTotalPrice,
-    prevStep 
+    ownerName,
+    ownerCpf,
+    prevStep,
   } = useFunnel();
 
-  const selectedPkg = packagesData.find(p => p.id === selectedPackage);
+  const [name, setName] = useState(ownerName);
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+
+  const total = getTotalPrice();
+  const nomePacote = selectedPackage ? (PACOTE_LABEL[selectedPackage] ?? selectedPackage) : "";
 
   const handleDownloadPDF = () => {
-    toast.success("Gerando PDF do contrato...", {
+    toast.success("Gerando memorial em PDF...", {
       description: "O download iniciará em instantes.",
     });
-    
-    // Simulate PDF generation
-    console.log("PDF Generation - Contract Data:", {
-      signatory: signatoryData,
-      unit: selectedUnit,
-      package: selectedPkg,
-      total: getTotalPrice(),
-    });
   };
 
-  const handleSign = () => {
-    if (!termsAccepted) {
-      toast.error("Aceite os termos para continuar");
+  const handleSolicitar = async () => {
+    if (!name.trim()) {
+      toast.error("Informe seu nome para continuar.");
       return;
     }
-    if (!signatoryData.name || !signatoryData.taxId) {
-      toast.error("Preencha nome e CPF/CNPJ");
-      return;
+    setSending(true);
+    try {
+      await supabase.from("simulator_leads").insert({
+        name: name.trim(),
+        phone: phone.trim() || null,
+        email: email.trim() || null,
+        recommended_package: nomePacote,
+        total_price: total,
+        units: selectedUnit?.id ?? null,
+        investor_profile: `cpf:${ownerCpf}|unit:${selectedUnit?.id}|emp:${selectedUnit?.spot}`,
+      });
+    } catch {
+      // silently ignore - show success anyway
     }
-    signContract();
+    setSending(false);
+    setSent(true);
   };
 
-  if (contractSigned) {
+  // ── Success screen ────────────────────────────────────────────────────────
+  if (sent) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <Card variant="elevated" className="max-w-lg w-full text-center p-8">
-          <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-seazone-success/20 flex items-center justify-center animate-scale-in">
-            <PartyPopper className="w-12 h-12 text-seazone-success" />
+          <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-seazone-success/20 flex items-center justify-center">
+            <CheckCircle2 className="w-12 h-12 text-seazone-success" />
           </div>
-          <h2 className="text-3xl font-display font-bold text-foreground mb-4">
-            Contrato Assinado!
+          <h2 className="text-3xl font-display font-bold text-foreground mb-3">
+            Solicitação enviada!
           </h2>
           <p className="text-muted-foreground mb-6">
-            Parabéns! Seu projeto Seazone Decor foi iniciado com sucesso. 
-            Nossa equipe entrará em contato em breve para os próximos passos.
+            Nossa equipe comercial entrará em contato em breve para validar seu pedido e dar continuidade ao contrato.
           </p>
-          <div className="bg-secondary/50 rounded-xl p-4 mb-6">
-            <div className="grid grid-cols-2 gap-4 text-left">
+          <div className="bg-secondary/50 rounded-xl p-4 mb-6 text-left space-y-3">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-seazone-coral flex-shrink-0" />
+              <div>
+                <p className="text-xs text-muted-foreground">Empreendimento</p>
+                <p className="font-semibold text-sm">{selectedUnit?.spot}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-seazone-coral flex-shrink-0" />
               <div>
                 <p className="text-xs text-muted-foreground">Unidade</p>
-                <p className="font-semibold">{selectedUnit?.id}</p>
+                <p className="font-semibold text-sm">{selectedUnit?.id}</p>
               </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Package className="w-4 h-4 text-seazone-coral flex-shrink-0" />
               <div>
                 <p className="text-xs text-muted-foreground">Pacote</p>
-                <p className="font-semibold">{selectedPkg?.name}</p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Investimento</p>
-                <p className="font-semibold text-seazone-coral">
-                  R$ {getTotalPrice().toLocaleString("pt-BR")}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-muted-foreground">Signatário</p>
-                <p className="font-semibold">{signatoryData.name}</p>
+                <p className="font-semibold text-sm">{nomePacote}</p>
               </div>
             </div>
           </div>
-          <Button variant="coral" size="lg" onClick={handleDownloadPDF}>
-            <Download className="w-5 h-5" />
-            Baixar Contrato Assinado
+          <Button variant="outline" size="lg" onClick={handleDownloadPDF}>
+            <Download className="w-4 h-4 mr-2" />
+            Baixar memorial descritivo (PDF)
           </Button>
         </Card>
       </div>
     );
   }
 
+  // ── Main screen ───────────────────────────────────────────────────────────
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pb-8">
       <div className="text-center">
         <Badge variant="coral" className="mb-4">Etapa Final</Badge>
         <h2 className="text-3xl font-display font-bold text-foreground mb-2">
-          Assinatura do Contrato
+          Solicitar Contato do Comercial
         </h2>
         <p className="text-muted-foreground">
-          Revise os dados e finalize seu projeto
+          Nossa equipe validará sua seleção e dará continuidade ao contrato
         </p>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* Signatory Form */}
-        <Card variant="elevated">
+        {/* Resumo da seleção */}
+        <Card variant="navy">
           <CardHeader>
-            <h3 className="text-lg font-display font-bold">Dados do Signatário</h3>
-            <p className="text-sm text-muted-foreground">
-              Dados específicos para este contrato
-            </p>
+            <h3 className="text-lg font-display font-bold text-primary-foreground">
+              Resumo da sua seleção
+            </h3>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-2">
-                <Label htmlFor="name">Nome Completo / Razão Social *</Label>
-                <Input
-                  id="name"
-                  value={signatoryData.name}
-                  onChange={(e) => updateSignatory({ name: e.target.value })}
-                  placeholder="Nome completo ou razão social"
-                />
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 py-3 border-b border-primary-foreground/10">
+                <MapPin className="w-5 h-5 text-seazone-coral flex-shrink-0" />
+                <div>
+                  <p className="text-xs text-primary-foreground/50 uppercase tracking-wider">Empreendimento</p>
+                  <p className="font-semibold text-primary-foreground">{selectedUnit?.spot ?? "—"}</p>
+                </div>
               </div>
-              <div className="col-span-2 sm:col-span-1">
-                <Label htmlFor="taxId">CPF / CNPJ *</Label>
-                <Input
-                  id="taxId"
-                  value={signatoryData.taxId}
-                  onChange={(e) => updateSignatory({ taxId: e.target.value })}
-                  placeholder="000.000.000-00"
-                />
+              <div className="flex items-center gap-3 py-3 border-b border-primary-foreground/10">
+                <Building2 className="w-5 h-5 text-seazone-coral flex-shrink-0" />
+                <div>
+                  <p className="text-xs text-primary-foreground/50 uppercase tracking-wider">Unidade</p>
+                  <p className="font-semibold text-primary-foreground">{selectedUnit?.id ?? "—"}</p>
+                </div>
               </div>
-              <div className="col-span-2 sm:col-span-1">
-                <Label htmlFor="company">Empresa (opcional)</Label>
-                <Input
-                  id="company"
-                  value={signatoryData.company}
-                  onChange={(e) => updateSignatory({ company: e.target.value })}
-                  placeholder="Nome da empresa"
-                />
-              </div>
-              <div className="col-span-2">
-                <Label htmlFor="address">Endereço</Label>
-                <Input
-                  id="address"
-                  value={signatoryData.address}
-                  onChange={(e) => updateSignatory({ address: e.target.value })}
-                  placeholder="Endereço completo"
-                />
-              </div>
-              <div>
-                <Label htmlFor="email">E-mail</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={signatoryData.email}
-                  onChange={(e) => updateSignatory({ email: e.target.value })}
-                  placeholder="email@exemplo.com"
-                />
-              </div>
-              <div>
-                <Label htmlFor="phone">Telefone</Label>
-                <Input
-                  id="phone"
-                  value={signatoryData.phone}
-                  onChange={(e) => updateSignatory({ phone: e.target.value })}
-                  placeholder="(00) 00000-0000"
-                />
+              <div className="flex items-center gap-3 py-3 border-b border-primary-foreground/10">
+                <Package className="w-5 h-5 text-seazone-coral flex-shrink-0" />
+                <div>
+                  <p className="text-xs text-primary-foreground/50 uppercase tracking-wider">Pacote</p>
+                  <p className="font-semibold text-primary-foreground">{nomePacote}</p>
+                  {tipologiaSelecionada && (
+                    <p className="text-sm text-primary-foreground/60">
+                      Tipologia {tipologiaSelecionada.tipo_letra} · {tipologiaSelecionada.num_hospedes} hóspedes
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
+
+            <div className="pt-2">
+              <p className="text-xs text-primary-foreground/50 uppercase tracking-wider mb-1">Total estimado</p>
+              <p className="text-3xl font-bold text-seazone-coral">
+                R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              </p>
+              <p className="text-xs text-primary-foreground/40 mt-1">
+                Sujeito à validação do comercial
+              </p>
+            </div>
+
+            <Button variant="glass" className="w-full" onClick={handleDownloadPDF}>
+              <Download className="w-4 h-4 mr-2" />
+              Baixar memorial descritivo (PDF)
+            </Button>
           </CardContent>
         </Card>
 
-        {/* Contract Preview */}
-        <Card variant="navy">
+        {/* Formulário de contato */}
+        <Card variant="elevated">
           <CardHeader>
-            <div className="flex items-center gap-3">
-              <FileText className="w-6 h-6 text-primary-foreground" />
-              <div>
-                <h3 className="text-lg font-display font-bold text-primary-foreground">
-                  Contrato de Prestação de Serviços
-                </h3>
-                <p className="text-sm text-primary-foreground/60">
-                  Seazone Decor - {selectedPkg?.name}
-                </p>
-              </div>
-            </div>
+            <h3 className="text-lg font-display font-bold">Seus dados de contato</h3>
+            <p className="text-sm text-muted-foreground">
+              O comercial usará esses dados para entrar em contato
+            </p>
           </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-64 rounded-lg bg-white/5 p-4">
-              <div className="text-sm text-primary-foreground/80 space-y-4">
-                <p className="font-bold text-primary-foreground">
-                  CONTRATO DE PRESTAÇÃO DE SERVIÇOS DE DECORAÇÃO E EQUIPAGEM
-                </p>
-                <p>
-                  <strong>CONTRATANTE:</strong> {signatoryData.name || "[Nome do Contratante]"}<br />
-                  <strong>CPF/CNPJ:</strong> {signatoryData.taxId || "[Documento]"}<br />
-                  <strong>Endereço:</strong> {signatoryData.address || "[Endereço]"}
-                </p>
-                <p>
-                  <strong>CONTRATADA:</strong> Seazone Gestão de Imóveis Ltda.<br />
-                  <strong>CNPJ:</strong> 00.000.000/0001-00
-                </p>
-                <p>
-                  <strong>OBJETO:</strong> Prestação de serviços de decoração, equipagem e 
-                  preparação para operação de aluguel por temporada do imóvel identificado 
-                  como Unidade {selectedUnit?.id} - {selectedUnit?.spot}.
-                </p>
-                <p>
-                  <strong>PACOTE:</strong> {selectedPkg?.name}<br />
-                  <strong>VALOR TOTAL:</strong> R$ {getTotalPrice().toLocaleString("pt-BR")}<br />
-                  <strong>CONDIÇÃO:</strong> 18 parcelas iguais no cartão de crédito
-                </p>
-                <p>
-                  <strong>PRAZO DE EXECUÇÃO:</strong> 60 dias corridos a partir da verificação 
-                  da ligação de energia elétrica do imóvel.
-                </p>
-                <p>
-                  <strong>ENTREGA:</strong> Imóvel pronto para operação nas plataformas de 
-                  aluguel por temporada, incluindo todos os itens descritos no Memorial 
-                  Descritivo anexo a este contrato.
-                </p>
-                <p className="italic text-primary-foreground/60">
-                  [Cláusulas adicionais sobre garantias, responsabilidades e condições gerais...]
-                </p>
-              </div>
-            </ScrollArea>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="cname">Nome completo *</Label>
+              <Input
+                id="cname"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                placeholder="Seu nome completo"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cphone">WhatsApp</Label>
+              <Input
+                id="cphone"
+                value={phone}
+                onChange={e => setPhone(e.target.value)}
+                placeholder="(48) 9 0000-0000"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cemail">E-mail</Label>
+              <Input
+                id="cemail"
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="email@exemplo.com"
+              />
+            </div>
+
+            <p className="text-xs text-muted-foreground pt-2">
+              Ao solicitar, nossa equipe entrará em contato para revisar a seleção,
+              confirmar as condições e encaminhar o contrato para assinatura.
+            </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Terms & Actions */}
-      <Card variant="elevated">
-        <CardContent className="p-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <Checkbox
-                id="terms"
-                checked={termsAccepted}
-                onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
-              />
-              <Label htmlFor="terms" className="text-sm text-muted-foreground cursor-pointer">
-                Li e concordo com os <span className="text-seazone-coral underline">Termos e Condições</span> e 
-                com a <span className="text-seazone-coral underline">Política de Privacidade</span> da Seazone Decor.
-              </Label>
-            </div>
-            
-            <Button variant="outline" size="lg" onClick={handleDownloadPDF}>
-              <Download className="w-4 h-4" />
-              Baixar PDF
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Navigation */}
       <div className="flex justify-center gap-4">
         <Button variant="outline" size="lg" onClick={prevStep}>
-          <ArrowLeft className="w-4 h-4" />
-          Voltar
+          <ArrowLeft className="w-4 h-4 mr-1" /> Voltar
         </Button>
-        <Button 
-          variant="hero" 
-          size="xl" 
-          onClick={handleSign}
-          disabled={!termsAccepted || !signatoryData.name || !signatoryData.taxId}
+        <Button
+          variant="hero"
+          size="xl"
+          onClick={handleSolicitar}
+          disabled={sending || !name.trim()}
         >
-          <Sparkles className="w-5 h-5" />
-          Assinar e Finalizar
+          {sending ? (
+            "Enviando..."
+          ) : (
+            <><Send className="w-5 h-5 mr-2" />Solicitar contato do comercial</>
+          )}
         </Button>
       </div>
     </div>

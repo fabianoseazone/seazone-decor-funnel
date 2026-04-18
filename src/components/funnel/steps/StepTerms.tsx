@@ -32,36 +32,37 @@ export function StepTerms() {
   const calc = useMemo(() => {
     const total = getTotalPrice();
     const hoje = new Date();
-    hoje.setDate(1); // início do mês atual
+    hoje.setDate(1);
 
-    // Delivery date from DB; fallback to 18 months from now
     const dataEntrega: Date = empreendimento?.data_entrega
       ? new Date(empreendimento.data_entrega + "T12:00:00")
       : addMonths(hoje, 18);
     dataEntrega.setDate(1);
 
-    // Decoration starts the month after delivery
-    const decorInicio = addMonths(dataEntrega, 1);
+    // 80% paid in equal monthly installments until 30 days before delivery
+    const ultimaParcela = addMonths(dataEntrega, -1);
+    const numParcelas = Math.max(1, monthsBetween(hoje, ultimaParcela));
+    const valor80 = total * 0.8;
+    const parcelaObra = valor80 / numParcelas;
 
-    // 90% in equal monthly installments until delivery
-    const numParcelas = monthsBetween(hoje, dataEntrega);
-    const valor90 = total * 0.9;
-    const parcelaObra = valor90 / numParcelas;
-
-    // 10% in 2 installments post-delivery
-    const valor10 = total * 0.1;
-    const parcelaPosEntrega = valor10 / 2;
+    // 20% in 2 installments after delivery
+    const valor20 = total * 0.2;
+    const parcelaPosEntrega = valor20 / 2;
     const parcela1PosEntrega = addMonths(dataEntrega, 1);
     const parcela2PosEntrega = addMonths(dataEntrega, 2);
 
+    // Decoration starts the month after delivery
+    const decorInicio = addMonths(dataEntrega, 1);
+
     return {
       total,
-      valor90,
-      valor10,
+      valor80,
+      valor20,
       numParcelas,
       parcelaObra,
       parcelaPosEntrega,
       dataEntrega,
+      ultimaParcela,
       decorInicio,
       parcela1PosEntrega,
       parcela2PosEntrega,
@@ -105,18 +106,18 @@ export function StepTerms() {
               </span>
             </div>
 
-            {/* 90% block */}
+            {/* 80% block */}
             <div className="rounded-xl border border-border overflow-hidden">
               <div className="px-4 py-2 bg-seazone-navy">
                 <p className="text-xs font-bold text-primary-foreground/80 uppercase tracking-wider">
-                  90% — até a entrega da obra
+                  80% — até 30 dias antes da entrega
                 </p>
               </div>
               <div className="px-4 py-3 space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Valor (90%)</span>
+                  <span className="text-muted-foreground">Valor (80%)</span>
                   <span className="font-semibold">
-                    R$ {calc.valor90.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    R$ {calc.valor80.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
@@ -136,18 +137,18 @@ export function StepTerms() {
               </div>
             </div>
 
-            {/* 10% block */}
+            {/* 20% block */}
             <div className="rounded-xl border border-border overflow-hidden">
               <div className="px-4 py-2 bg-secondary">
                 <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                  10% — após a entrega
+                  20% — após a entrega (2 parcelas)
                 </p>
               </div>
               <div className="px-4 py-3 space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Valor (10%)</span>
+                  <span className="text-muted-foreground">Valor (20%)</span>
                   <span className="font-semibold">
-                    R$ {calc.valor10.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    R$ {calc.valor20.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
@@ -176,7 +177,7 @@ export function StepTerms() {
               </div>
               <div>
                 <h3 className="font-display font-bold text-base">Cronograma</h3>
-                <p className="text-xs text-muted-foreground">{calc.numParcelas} meses até a entrega</p>
+                <p className="text-xs text-muted-foreground">{calc.numParcelas} parcelas até {formatMes(calc.ultimaParcela)}</p>
               </div>
             </div>
 
@@ -191,9 +192,15 @@ export function StepTerms() {
                 },
                 {
                   dot: "bg-seazone-gold",
+                  label: "30 dias antes da entrega",
+                  sub: formatMes(calc.ultimaParcela),
+                  detail: "Última parcela do 80%",
+                },
+                {
+                  dot: "bg-seazone-gold",
                   label: "Entrega da obra",
                   sub: formatMes(calc.dataEntrega),
-                  detail: "90% do contrato quitado",
+                  detail: "80% do contrato quitado",
                 },
                 {
                   dot: "bg-blue-500",
@@ -204,7 +211,7 @@ export function StepTerms() {
                 },
                 {
                   dot: "bg-seazone-success",
-                  label: "2 últimas parcelas",
+                  label: "2 parcelas finais (20%)",
                   sub: `${formatMes(calc.parcela1PosEntrega)} e ${formatMes(calc.parcela2PosEntrega)}`,
                   detail: `R$ ${calc.parcelaPosEntrega.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} cada`,
                 },

@@ -35,6 +35,9 @@ interface FunnelContextType extends FunnelState {
   clearSwap: (originalCodigo: number) => void;
   subtotalProdutos: number;
   setSubtotalProdutos: (n: number) => void;
+  ownerName: string;
+  ownerCpf: string;
+  setOwnerInfo: (name: string, cpf: string) => void;
 }
 
 const defaultSignatory: SignatoryData = {
@@ -63,6 +66,8 @@ export function FunnelProvider({ children }: { children: ReactNode }) {
   const [adicionados, setAdicionados] = useState<Set<number>>(new Set());
   const [swaps, setSwapsState] = useState<Map<number, ProdutoTipologia>>(new Map());
   const [subtotalProdutos, setSubtotalProdutos] = useState(0);
+  const [ownerName, setOwnerNameState] = useState("");
+  const [ownerCpf, setOwnerCpfState] = useState("");
 
   const setSwap = useCallback((originalCodigo: number, newItem: ProdutoTipologia) => {
     setSwapsState(prev => new Map(prev).set(originalCodigo, newItem));
@@ -86,6 +91,11 @@ export function FunnelProvider({ children }: { children: ReactNode }) {
       next.has(produtoCodigo) ? next.delete(produtoCodigo) : next.add(produtoCodigo);
       return next;
     });
+  }, []);
+
+  const setOwnerInfo = useCallback((name: string, cpf: string) => {
+    setOwnerNameState(name);
+    setOwnerCpfState(cpf);
   }, []);
 
   const setTipologiaSelecionadaAndReset = useCallback((t: Tipologia | null) => {
@@ -141,6 +151,8 @@ export function FunnelProvider({ children }: { children: ReactNode }) {
     setAdicionados(new Set());
     setSwapsState(new Map());
     setSubtotalProdutos(0);
+    setOwnerNameState("");
+    setOwnerCpfState("");
   }, []);
 
   const getCustomizationsTotal = useCallback(() => {
@@ -198,6 +210,9 @@ export function FunnelProvider({ children }: { children: ReactNode }) {
         clearSwap,
         subtotalProdutos,
         setSubtotalProdutos,
+        ownerName,
+        ownerCpf,
+        setOwnerInfo,
         getCustomizationsTotal,
         canProceed,
       }}

@@ -118,12 +118,10 @@ export function StepSpecs() {
         </div>
 
         {/* Column headers */}
-        <div className="px-6 py-2 grid grid-cols-[48px_1fr_60px_100px_100px] gap-3 border-b border-border bg-secondary/40">
+        <div className="px-6 py-2 grid grid-cols-[48px_1fr_60px] gap-3 border-b border-border bg-secondary/40">
           <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider"></span>
           <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Produto</span>
           <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider text-center">Qtd</span>
-          <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider text-right">Unit.</span>
-          <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider text-right">Total</span>
         </div>
 
         {/* Items grouped by subcategoria */}
@@ -157,7 +155,7 @@ export function StepSpecs() {
                   return (
                     <div
                       key={item.id}
-                      className="px-6 py-3 grid grid-cols-[48px_1fr_60px_100px_100px] gap-3 items-center hover:bg-secondary/20 transition-colors"
+                      className="px-6 py-3 grid grid-cols-[48px_1fr_60px] gap-3 items-center hover:bg-secondary/20 transition-colors"
                     >
                       {/* Image */}
                       <div className="w-12 h-12 rounded-lg overflow-hidden bg-secondary flex items-center justify-center flex-shrink-0">
@@ -179,7 +177,7 @@ export function StepSpecs() {
                           {item.produto?.nome ?? `Produto ${item.produto_codigo}`}
                         </p>
                         <div className="flex gap-1 mt-0.5 flex-wrap">
-                          {isSwapped && <Badge variant="coral" className="text-[10px] py-0">Trocado</Badge>}
+                          {isSwapped && <Badge variant="coral" className="text-[10px] py-0">Personalizado</Badge>}
                           {isAdded && <Badge variant="secondary" className="text-[10px] py-0">Adicional</Badge>}
                         </div>
                       </div>
@@ -187,16 +185,6 @@ export function StepSpecs() {
                       {/* Qty */}
                       <span className="text-sm font-semibold text-foreground text-center">
                         {qty}
-                      </span>
-
-                      {/* Unit price */}
-                      <span className="text-sm text-muted-foreground text-right">
-                        R$ {unitPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                      </span>
-
-                      {/* Line total */}
-                      <span className="text-sm font-semibold text-foreground text-right">
-                        R$ {lineTotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
                       </span>
                     </div>
                   );
@@ -207,25 +195,12 @@ export function StepSpecs() {
         </div>
 
         {/* Totals */}
-        <div className="border-t border-border bg-secondary/30 px-6 py-4 space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Subtotal produtos ({allItems.length} itens)</span>
-            <span className="font-medium">R$ {subtotalProdutos.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
-          </div>
-          {decorValor > 0 && (
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Serviço de decoração</span>
-              <span className="font-medium">R$ {decorValor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
+        <div className="border-t border-border bg-secondary/30 px-6 py-4">
+          <div className="flex justify-between items-center">
+            <div>
+              <span className="font-bold text-foreground text-base">Total Decor Lucrativo</span>
+              <p className="text-xs text-muted-foreground">{allItems.length} itens</p>
             </div>
-          )}
-          {admPercent > 0 && (
-            <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Taxa de administração ({tipologiaSelecionada?.adm_percent ?? 0}%)</span>
-              <span className="font-medium">R$ {admValor.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
-            </div>
-          )}
-          <div className="flex justify-between pt-2 border-t border-border">
-            <span className="font-bold text-foreground text-base">Total</span>
             <span className="font-bold text-seazone-coral text-xl">
               R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
             </span>
