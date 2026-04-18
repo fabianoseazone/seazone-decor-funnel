@@ -38,6 +38,8 @@ interface FunnelContextType extends FunnelState {
   ownerName: string;
   ownerCpf: string;
   setOwnerInfo: (name: string, cpf: string) => void;
+  recommendedPackageAbrev: string | null;
+  setRecommendedPackageHint: (abrev: string | null) => void;
 }
 
 const defaultSignatory: SignatoryData = {
@@ -68,6 +70,7 @@ export function FunnelProvider({ children }: { children: ReactNode }) {
   const [subtotalProdutos, setSubtotalProdutos] = useState(0);
   const [ownerName, setOwnerNameState] = useState("");
   const [ownerCpf, setOwnerCpfState] = useState("");
+  const [recommendedPackageAbrev, setRecommendedPackageAbrev] = useState<string | null>(null);
 
   const setSwap = useCallback((originalCodigo: number, newItem: ProdutoTipologia) => {
     setSwapsState(prev => new Map(prev).set(originalCodigo, newItem));
@@ -96,6 +99,10 @@ export function FunnelProvider({ children }: { children: ReactNode }) {
   const setOwnerInfo = useCallback((name: string, cpf: string) => {
     setOwnerNameState(name);
     setOwnerCpfState(cpf);
+  }, []);
+
+  const setRecommendedPackageHint = useCallback((abrev: string | null) => {
+    setRecommendedPackageAbrev(abrev);
   }, []);
 
   const setTipologiaSelecionadaAndReset = useCallback((t: Tipologia | null) => {
@@ -153,6 +160,7 @@ export function FunnelProvider({ children }: { children: ReactNode }) {
     setSubtotalProdutos(0);
     setOwnerNameState("");
     setOwnerCpfState("");
+    setRecommendedPackageAbrev(null);
   }, []);
 
   const getCustomizationsTotal = useCallback(() => {
@@ -213,6 +221,8 @@ export function FunnelProvider({ children }: { children: ReactNode }) {
         ownerName,
         ownerCpf,
         setOwnerInfo,
+        recommendedPackageAbrev,
+        setRecommendedPackageHint,
         getCustomizationsTotal,
         canProceed,
       }}

@@ -288,9 +288,10 @@ function RenderGallery({ empreendimentoCodigo, pacoteCodigo, nomePacote }: {
   );
 }
 
-function PackageCard({ tip, isSelected, onSelect }: {
+function PackageCard({ tip, isSelected, isRecommended, onSelect }: {
   tip: any;
   isSelected: boolean;
+  isRecommended?: boolean;
   onSelect: (tip: any) => void;
 }) {
   const abrev: string = tip.pacote?.abreviacao ?? "";
@@ -306,6 +307,11 @@ function PackageCard({ tip, isSelected, onSelect }: {
       onClick={() => onSelect(tip)}
     >
       <CardHeader className="text-center pb-4">
+        {isRecommended && (
+          <Badge variant="coral" className="mx-auto mb-3 text-xs">
+            ✦ Recomendado para você
+          </Badge>
+        )}
         <div className="flex justify-center mb-4">
           <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${
             abrev === "PR" ? "bg-premium-gradient" :
@@ -315,7 +321,6 @@ function PackageCard({ tip, isSelected, onSelect }: {
           </div>
         </div>
         <h3 className="text-xl font-display font-bold">{nome}</h3>
-        <p className="text-sm text-muted-foreground">{abrev}</p>
       </CardHeader>
 
       <CardContent className="space-y-4">
@@ -340,7 +345,7 @@ function PackageCard({ tip, isSelected, onSelect }: {
 }
 
 export function StepPackageSelection() {
-  const { selectedUnit, selectPackage, setTipologiaSelecionada, tipologiaSelecionada, nextStep, setCurrentStep } = useFunnel();
+  const { selectedUnit, selectPackage, setTipologiaSelecionada, tipologiaSelecionada, nextStep, setCurrentStep, recommendedPackageAbrev } = useFunnel();
 
   const tipologiaCodigo = selectedUnit?.tipologiaCodigo ?? null;
   const { data: tipologias, isLoading } = useTipologiasDisponiveis(tipologiaCodigo);
@@ -350,6 +355,13 @@ export function StepPackageSelection() {
     selectPackage((PACOTE_LABEL[abrev]?.toLowerCase() ?? "essential") as any);
     setTipologiaSelecionada(tip);
   };
+
+  // Auto-select recommended package when coming from the prospect quiz
+  useEffect(() => {
+    if (!tipologias?.length || !recommendedPackageAbrev || tipologiaSelecionada) return;
+    const match = tipologias.find((t: any) => t.pacote?.abreviacao === recommendedPackageAbrev);
+    if (match) handleSelect(match);
+  }, [tipologias, recommendedPackageAbrev]);
 
   if (isLoading) {
     return (
@@ -372,6 +384,7 @@ export function StepPackageSelection() {
             key={tip.id}
             tip={tip}
             isSelected={tipologiaSelecionada?.codigo === tip.codigo}
+            isRecommended={!!recommendedPackageAbrev && tip.pacote?.abreviacao === recommendedPackageAbrev}
             onSelect={handleSelect}
           />
         ))}

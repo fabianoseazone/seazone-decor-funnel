@@ -39,13 +39,13 @@
     --radius: 0.75rem;
 
     /* Custom Seazone tokens */
-    --seazone-navy: 220 50% 12%;
-    --seazone-navy-light: 220 40% 20%;
-    --seazone-coral: 8 100% 68%;
-    --seazone-coral-light: 8 100% 75%;
-    --seazone-gold: 45 90% 55%;
-    --seazone-success: 160 70% 45%;
-    --seazone-blue-glow: 220 80% 60%;
+    --seazone-navy: 222 58% 10%;
+    --seazone-navy-light: 222 45% 20%;
+    --seazone-coral: 14 88% 58%;
+    --seazone-coral-light: 14 88% 68%;
+    --seazone-gold: 42 85% 52%;
+    --seazone-success: 158 65% 40%;
+    --seazone-blue-glow: 222 75% 58%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -121,19 +121,19 @@
   }
 
   .bg-hero {
-    background: linear-gradient(135deg, hsl(220 50% 12%) 0%, hsl(220 40% 22%) 100%);
+    background: linear-gradient(145deg, hsl(222 58% 8%) 0%, hsl(220 52% 14%) 50%, hsl(218 45% 20%) 100%);
   }
 
   .bg-navy-gradient {
-    background: linear-gradient(135deg, hsl(220 50% 18%) 0%, hsl(225 60% 28%) 100%);
+    background: linear-gradient(145deg, hsl(222 52% 16%) 0%, hsl(224 58% 26%) 100%);
   }
 
   .bg-coral-gradient {
-    background: linear-gradient(135deg, hsl(8 100% 68%) 0%, hsl(15 100% 60%) 100%);
+    background: linear-gradient(135deg, hsl(14 88% 58%) 0%, hsl(20 90% 52%) 100%);
   }
 
   .bg-premium-gradient {
-    background: linear-gradient(135deg, hsl(45 90% 55%) 0%, hsl(35 95% 50%) 100%);
+    background: linear-gradient(135deg, hsl(42 85% 50%) 0%, hsl(32 88% 44%) 100%);
   }
 
   .shadow-card {
