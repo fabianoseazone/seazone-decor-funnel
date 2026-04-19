@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ArrowRight, ArrowLeft, Search, ImageOff } from "lucide-react";
+import { ArrowRight, ArrowLeft, Search, ImageOff, ChevronDown, ChevronRight as ChevronRightIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,28 @@ import { Input } from "@/components/ui/input";
 import { useFunnel } from "@/contexts/FunnelContext";
 import { useProdutosTipologia } from "@/hooks/useProdutosTipologia";
 import type { ProdutoTipologia } from "@/types/catalog";
+
+const SUBCATEGORIA_NOME: Record<string, string> = {
+  "2.1.1": "Painéis e Nichos",
+  "2.1.2": "Bancada de Cozinha",
+  "2.1.3": "Metais e Acessórios",
+  "2.1.4": "Box de Banheiro",
+  "2.1.5": "Iluminação",
+  "2.1.6": "Mobiliário Externo",
+  "2.1.7": "Decoração e Acessórios",
+  "2.1.8": "Eletrodomésticos",
+  "2.1.9": "Enxoval e Utensílios",
+  "2.1.10": "Mezanino",
+  "2.2.1": "Pintura",
+  "2.2.2": "Feltro e Proteção",
+  "2.2.3": "Instalações Elétricas",
+  "2.2.4": "Instalações Hidráulicas",
+  "2.2.5": "Ar Condicionado",
+  "2.2.6": "Revestimentos e Fechamentos",
+  "2.2.8": "Conservação e Limpeza",
+  "2.2.9": "RRT",
+  "2.2.10": "Marmoraria",
+};
 
 function getDriveImageUrl(url: string | null | undefined): string | null {
   if (!url) return null;
@@ -26,6 +48,15 @@ export function StepSpecs() {
   } = useFunnel();
 
   const [search, setSearch] = useState("");
+  const [closedGroups, setClosedGroups] = useState<Set<string>>(new Set());
+
+  const toggleGroup = (key: string) => {
+    setClosedGroups(prev => {
+      const next = new Set(prev);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
+  };
 
   const tipologiaCodigo = tipologiaSelecionada?.codigo ?? null;
   const { produtosPadrao, produtosAdicionais, isLoading } = useProdutosTipologia(tipologiaCodigo);
@@ -135,62 +166,76 @@ export function StepSpecs() {
               Nenhum item encontrado.
             </div>
           ) : (
-            Object.entries(groups).map(([categoria, items]) => (
-              <div key={categoria}>
-                {/* Category header */}
-                <div className="px-6 py-2 bg-secondary/20">
-                  <span className="text-[11px] font-bold text-seazone-coral uppercase tracking-wider">
-                    {categoria}
-                  </span>
-                </div>
-                {/* Rows */}
-                {items.map((item: any) => {
-                  const imgUrl = getDriveImageUrl(item.produto?.imagem_url);
-                  const unitPrice = item.valor_unitario ?? 0;
-                  const qty = item.quantidade ?? 1;
-                  const lineTotal = unitPrice * qty;
-                  const isSwapped = swaps.has(item._originalCodigo ?? item.produto_codigo);
-                  const isAdded = item._secao === "Itens Adicionais";
-
-                  return (
-                    <div
-                      key={item.id}
-                      className="px-6 py-3 grid grid-cols-[48px_1fr_60px] gap-3 items-center hover:bg-secondary/20 transition-colors"
-                    >
-                      {/* Image */}
-                      <div className="w-12 h-12 rounded-lg overflow-hidden bg-secondary flex items-center justify-center flex-shrink-0">
-                        {imgUrl ? (
-                          <img
-                            src={imgUrl}
-                            alt={item.produto?.nome ?? ""}
-                            className="w-full h-full object-cover"
-                            onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
-                          />
-                        ) : (
-                          <ImageOff className="w-4 h-4 text-muted-foreground" />
-                        )}
-                      </div>
-
-                      {/* Name + badges */}
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-foreground leading-snug truncate">
-                          {item.produto?.nome ?? `Produto ${item.produto_codigo}`}
-                        </p>
-                        <div className="flex gap-1 mt-0.5 flex-wrap">
-                          {isSwapped && <Badge variant="coral" className="text-[10px] py-0">Personalizado</Badge>}
-                          {isAdded && <Badge variant="secondary" className="text-[10px] py-0">Adicional</Badge>}
-                        </div>
-                      </div>
-
-                      {/* Qty */}
-                      <span className="text-sm font-semibold text-foreground text-center">
-                        {qty}
+            Object.entries(groups).map(([categoria, items]) => {
+              const isOpen = !closedGroups.has(categoria);
+              const nomeGrupo = SUBCATEGORIA_NOME[categoria] ?? categoria;
+              return (
+                <div key={categoria}>
+                  {/* Category header — clickable to toggle */}
+                  <button
+                    onClick={() => toggleGroup(categoria)}
+                    className="w-full px-6 py-2.5 bg-secondary/20 hover:bg-secondary/40 transition-colors flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] font-bold text-seazone-coral uppercase tracking-wider">
+                        {nomeGrupo}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground font-medium">
+                        {items.length} {items.length === 1 ? "item" : "itens"}
                       </span>
                     </div>
-                  );
-                })}
-              </div>
-            ))
+                    {isOpen
+                      ? <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                      : <ChevronRightIcon className="w-4 h-4 text-muted-foreground" />
+                    }
+                  </button>
+                  {/* Rows */}
+                  {isOpen && items.map((item: any) => {
+                    const imgUrl = getDriveImageUrl(item.produto?.imagem_url);
+                    const qty = item.quantidade ?? 1;
+                    const isSwapped = swaps.has(item._originalCodigo ?? item.produto_codigo);
+                    const isAdded = item._secao === "Itens Adicionais";
+
+                    return (
+                      <div
+                        key={item.id}
+                        className="px-6 py-3 grid grid-cols-[48px_1fr_60px] gap-3 items-center hover:bg-secondary/20 transition-colors"
+                      >
+                        {/* Image */}
+                        <div className="w-12 h-12 rounded-lg overflow-hidden bg-secondary flex items-center justify-center flex-shrink-0">
+                          {imgUrl ? (
+                            <img
+                              src={imgUrl}
+                              alt={item.produto?.nome ?? ""}
+                              className="w-full h-full object-cover"
+                              onError={e => { (e.target as HTMLImageElement).style.display = "none"; }}
+                            />
+                          ) : (
+                            <ImageOff className="w-4 h-4 text-muted-foreground" />
+                          )}
+                        </div>
+
+                        {/* Name + badges */}
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-foreground leading-snug truncate">
+                            {item.produto?.nome ?? `Produto ${item.produto_codigo}`}
+                          </p>
+                          <div className="flex gap-1 mt-0.5 flex-wrap">
+                            {isSwapped && <Badge variant="coral" className="text-[10px] py-0">Personalizado</Badge>}
+                            {isAdded && <Badge variant="secondary" className="text-[10px] py-0">Adicional</Badge>}
+                          </div>
+                        </div>
+
+                        {/* Qty */}
+                        <span className="text-sm font-semibold text-foreground text-center">
+                          {qty}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })
           )}
         </div>
 

@@ -10,6 +10,28 @@ import { useProdutosTipologia } from "@/hooks/useProdutosTipologia";
 import { useProdutosSubstitutos } from "@/hooks/useProdutosSubstitutos";
 import type { ProdutoTipologia } from "@/types/catalog";
 
+const SUBCATEGORIA_NOME: Record<string, string> = {
+  "2.1.1": "Painéis e Nichos",
+  "2.1.2": "Bancada de Cozinha",
+  "2.1.3": "Metais e Acessórios",
+  "2.1.4": "Box de Banheiro",
+  "2.1.5": "Iluminação",
+  "2.1.6": "Mobiliário Externo",
+  "2.1.7": "Decoração e Acessórios",
+  "2.1.8": "Eletrodomésticos",
+  "2.1.9": "Enxoval e Utensílios",
+  "2.1.10": "Mezanino",
+  "2.2.1": "Pintura",
+  "2.2.2": "Feltro e Proteção",
+  "2.2.3": "Instalações Elétricas",
+  "2.2.4": "Instalações Hidráulicas",
+  "2.2.5": "Ar Condicionado",
+  "2.2.6": "Revestimentos e Fechamentos",
+  "2.2.8": "Conservação e Limpeza",
+  "2.2.9": "RRT",
+  "2.2.10": "Marmoraria",
+};
+
 /** Converts a Google Drive view/share URL to a displayable thumbnail URL. */
 function getDriveImageUrl(url: string | null | undefined): string | null {
   if (!url) return null;
@@ -278,42 +300,46 @@ export function StepCustomization() {
       {/* Active product groups */}
       {Object.entries(groups).map(([categoria, items]) => (
         <div key={categoria} className="space-y-3">
-          <h3 className="text-xs font-bold text-seazone-coral uppercase tracking-wider">{categoria}</h3>
+          <h3 className="text-xs font-bold text-seazone-coral uppercase tracking-wider">
+            {SUBCATEGORIA_NOME[categoria] ?? categoria}
+          </h3>
           <div className="grid md:grid-cols-2 gap-3">
             {items.map((item: any) => {
               const isSwapped = swaps.has(item._originalCodigo ?? item.produto_codigo);
-              const price = (item.valor_unitario ?? 0) * (item.quantidade ?? 1);
               return (
                 <Card key={item.id} variant="elevated" className="hover:border-seazone-coral/40 transition-all group">
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3">
-                      <div
-                        className="flex-shrink-0 cursor-pointer"
-                        onClick={() => openSwap(item)}
-                      >
+                      <div className="flex-shrink-0 cursor-pointer" onClick={() => openSwap(item)}>
                         {item.produto?.imagem_url ? (
                           <img src={getDriveImageUrl(item.produto.imagem_url)!} alt={item.produto.nome} className="w-20 h-20 rounded-xl object-cover" onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                         ) : (
                           <div className="w-20 h-20 rounded-xl bg-secondary" />
                         )}
                       </div>
-                      <div className="flex-1 min-w-0 cursor-pointer" onClick={() => openSwap(item)}>
-                        <div className="flex items-start gap-2 mb-1">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start gap-2 mb-0.5">
                           <p className="font-semibold text-foreground text-sm leading-tight flex-1">
                             {item.produto?.nome ?? `Produto ${item.produto_codigo}`}
                           </p>
                           {isSwapped && <Badge variant="coral" className="text-[10px] flex-shrink-0">Personalizado</Badge>}
                         </div>
                         <span className="text-xs text-muted-foreground">Qtd: {item.quantidade}</span>
-                      </div>
-                      {/* Actions */}
-                      <div className="flex flex-col gap-2 flex-shrink-0">
-                        <button onClick={() => openSwap(item)} className="p-2 rounded-lg hover:bg-seazone-coral/10 text-muted-foreground hover:text-seazone-coral transition-colors" title="Trocar">
-                          <RefreshCw className="w-5 h-5" />
-                        </button>
-                        <button onClick={() => toggleRemovido(item._originalCodigo ?? item.produto_codigo)} className="p-2 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors" title="Remover">
-                          <Trash2 className="w-5 h-5" />
-                        </button>
+                        {/* Actions below name */}
+                        <div className="flex gap-1.5 mt-2">
+                          <button
+                            onClick={() => openSwap(item)}
+                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-border hover:border-seazone-coral/50 hover:bg-seazone-coral/8 text-muted-foreground hover:text-seazone-coral transition-colors text-xs font-medium"
+                          >
+                            <RefreshCw className="w-3.5 h-3.5" /> Trocar
+                          </button>
+                          <button
+                            onClick={() => toggleRemovido(item._originalCodigo ?? item.produto_codigo)}
+                            className="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-border hover:border-destructive/40 hover:bg-destructive/8 text-muted-foreground hover:text-destructive transition-colors text-xs font-medium"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" /> Remover
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </CardContent>
