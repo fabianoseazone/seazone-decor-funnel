@@ -1,10 +1,8 @@
 import { useState } from "react";
-import { ArrowLeft, Download, Send, CheckCircle2, Building2, MapPin, Package } from "lucide-react";
+import { ArrowLeft, Download, Send, CheckCircle2, Building2, MapPin, Package, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useFunnel } from "@/contexts/FunnelContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -26,9 +24,6 @@ export function StepContract() {
     prevStep,
   } = useFunnel();
 
-  const [name, setName] = useState(ownerName);
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
 
@@ -42,16 +37,12 @@ export function StepContract() {
   };
 
   const handleSolicitar = async () => {
-    if (!name.trim()) {
-      toast.error("Informe seu nome para continuar.");
-      return;
-    }
     setSending(true);
     try {
       await supabase.from("simulator_leads").insert({
-        name: name.trim(),
-        phone: phone.trim() || null,
-        email: email.trim() || null,
+        name: ownerName || "Proprietário",
+        phone: null,
+        email: null,
         recommended_package: nomePacote,
         total_price: total,
         units: selectedUnit?.id ?? null,
@@ -123,7 +114,7 @@ export function StepContract() {
         </p>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="max-w-lg mx-auto space-y-4">
         {/* Resumo da seleção */}
         <Card variant="navy">
           <CardHeader>
@@ -178,50 +169,10 @@ export function StepContract() {
           </CardContent>
         </Card>
 
-        {/* Formulário de contato */}
-        <Card variant="elevated">
-          <CardHeader>
-            <h3 className="text-lg font-display font-bold">Seus dados de contato</h3>
-            <p className="text-sm text-muted-foreground">
-              O comercial usará esses dados para entrar em contato
-            </p>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="cname">Nome completo *</Label>
-              <Input
-                id="cname"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                placeholder="Seu nome completo"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="cphone">WhatsApp</Label>
-              <Input
-                id="cphone"
-                value={phone}
-                onChange={e => setPhone(e.target.value)}
-                placeholder="(48) 9 0000-0000"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="cemail">E-mail</Label>
-              <Input
-                id="cemail"
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="email@exemplo.com"
-              />
-            </div>
-
-            <p className="text-xs text-muted-foreground pt-2">
-              Ao solicitar, nossa equipe entrará em contato para revisar a seleção,
-              confirmar as condições e encaminhar o contrato para assinatura.
-            </p>
-          </CardContent>
-        </Card>
+        <p className="text-xs text-muted-foreground text-center px-4">
+          Ao solicitar, nossa equipe entrará em contato para revisar a seleção,
+          confirmar as condições e encaminhar o contrato para assinatura.
+        </p>
       </div>
 
       <div className="flex justify-center gap-4">
@@ -232,10 +183,10 @@ export function StepContract() {
           variant="hero"
           size="xl"
           onClick={handleSolicitar}
-          disabled={sending || !name.trim()}
+          disabled={sending}
         >
           {sending ? (
-            "Enviando..."
+            <><Loader2 className="w-5 h-5 mr-2 animate-spin" />Enviando...</>
           ) : (
             <><Send className="w-5 h-5 mr-2" />Solicitar contato do comercial</>
           )}
