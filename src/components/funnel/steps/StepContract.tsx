@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { ArrowLeft, Download, Send, CheckCircle2, Building2, MapPin, Package, Loader2 } from "lucide-react";
+import { ArrowLeft, Send, CheckCircle2, Building2, MapPin, Package, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useFunnel } from "@/contexts/FunnelContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { DownloadMemorialButton } from "@/components/funnel/DownloadMemorialButton";
 
 const PACOTE_LABEL: Record<string, string> = {
   essential: "Essential",
@@ -30,11 +31,6 @@ export function StepContract() {
   const total = getTotalPrice();
   const nomePacote = selectedPackage ? (PACOTE_LABEL[selectedPackage] ?? selectedPackage) : "";
 
-  const handleDownloadPDF = () => {
-    toast.success("Gerando memorial em PDF...", {
-      description: "O download iniciará em instantes.",
-    });
-  };
 
   const handleSolicitar = async () => {
     setSending(true);
@@ -92,10 +88,7 @@ export function StepContract() {
               </div>
             </div>
           </div>
-          <Button variant="outline" size="lg" onClick={handleDownloadPDF}>
-            <Download className="w-4 h-4 mr-2" />
-            Baixar memorial descritivo (PDF)
-          </Button>
+          <DownloadMemorialButton variant="outline" />
         </Card>
       </div>
     );
@@ -162,10 +155,7 @@ export function StepContract() {
               </p>
             </div>
 
-            <Button variant="glass" className="w-full" onClick={handleDownloadPDF}>
-              <Download className="w-4 h-4 mr-2" />
-              Baixar memorial descritivo (PDF)
-            </Button>
+            <DownloadMemorialButton variant="glass" />
           </CardContent>
         </Card>
 
