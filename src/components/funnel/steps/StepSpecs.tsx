@@ -40,6 +40,7 @@ function getDriveImageUrl(url: string | null | undefined): string | null {
 export function StepSpecs() {
   const {
     tipologiaSelecionada,
+    selectedUnit,
     removidos,
     adicionados,
     swaps,
@@ -48,10 +49,10 @@ export function StepSpecs() {
   } = useFunnel();
 
   const [search, setSearch] = useState("");
-  const [closedGroups, setClosedGroups] = useState<Set<string>>(new Set());
+  const [openGroups, setOpenGroups] = useState<Set<string>>(new Set());
 
   const toggleGroup = (key: string) => {
-    setClosedGroups(prev => {
+    setOpenGroups(prev => {
       const next = new Set(prev);
       next.has(key) ? next.delete(key) : next.add(key);
       return next;
@@ -102,8 +103,16 @@ export function StepSpecs() {
   const admValor = admPercent * subtotalProdutos;
   const total = subtotalProdutos + decorValor + admValor;
 
-  const pacoteNome = tipologiaSelecionada?.descricao ?? "Plano";
+  const isPersonalizado = swaps.size > 0 || removidos.size > 0;
+  const pkgAbrev = (tipologiaSelecionada as any)?.pacote?.abreviacao ?? "";
   const tipoLetra = tipologiaSelecionada?.tipo_letra ?? "";
+  const empreendimento = selectedUnit?.spot ?? "";
+
+  const pacoteNome = (() => {
+    const parts = [empreendimento, tipoLetra ? `Tipologia ${tipoLetra}` : null, pkgAbrev || (tipologiaSelecionada?.descricao ?? "Plano")].filter(Boolean);
+    const base = parts.join("_");
+    return isPersonalizado ? `${base}_Personalizado` : base;
+  })();
 
   return (
     <div className="space-y-6 pb-8">
@@ -123,11 +132,13 @@ export function StepSpecs() {
         {/* Invoice header */}
         <div className="bg-seazone-navy px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
-            <p className="text-primary-foreground/60 text-xs uppercase tracking-wider font-semibold">Plano selecionado</p>
-            <p className="text-primary-foreground font-display font-bold text-xl">{pacoteNome}</p>
-            {tipoLetra && (
-              <p className="text-primary-foreground/60 text-sm">Tipologia {tipoLetra}</p>
-            )}
+            <p className="text-primary-foreground/60 text-xs uppercase tracking-wider font-semibold">
+              Memorial Descritivo
+              {isPersonalizado && <span className="ml-2 text-seazone-coral">• Personalizado</span>}
+            </p>
+            <p className="text-primary-foreground font-display font-bold text-base leading-snug break-all">
+              {pacoteNome}
+            </p>
           </div>
           <div className="text-right">
             <p className="text-primary-foreground/60 text-xs uppercase tracking-wider font-semibold">Total de itens</p>
@@ -167,7 +178,7 @@ export function StepSpecs() {
             </div>
           ) : (
             Object.entries(groups).map(([categoria, items]) => {
-              const isOpen = !closedGroups.has(categoria);
+              const isOpen = openGroups.has(categoria);
               const nomeGrupo = SUBCATEGORIA_NOME[categoria] ?? categoria;
               return (
                 <div key={categoria}>

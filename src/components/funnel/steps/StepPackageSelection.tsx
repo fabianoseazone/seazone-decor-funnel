@@ -20,6 +20,28 @@ const PACOTE_LABEL: Record<string, string> = {
   ES: "Essential", PL: "Plus", PR: "Premium", HD1: "HD1", AM: "Ampliada",
 };
 
+const SUBCATEGORIA_NOME: Record<string, string> = {
+  "2.1.1": "Painéis e Nichos",
+  "2.1.2": "Bancada de Cozinha",
+  "2.1.3": "Metais e Acessórios",
+  "2.1.4": "Box de Banheiro",
+  "2.1.5": "Iluminação",
+  "2.1.6": "Mobiliário Externo",
+  "2.1.7": "Decoração e Acessórios",
+  "2.1.8": "Eletrodomésticos",
+  "2.1.9": "Enxoval e Utensílios",
+  "2.1.10": "Mezanino",
+  "2.2.1": "Pintura",
+  "2.2.2": "Feltro e Proteção",
+  "2.2.3": "Instalações Elétricas",
+  "2.2.4": "Instalações Hidráulicas",
+  "2.2.5": "Ar Condicionado",
+  "2.2.6": "Revestimentos e Fechamentos",
+  "2.2.8": "Conservação e Limpeza",
+  "2.2.9": "RRT",
+  "2.2.10": "Marmoraria",
+};
+
 function ProductList({ tipologiaCodigo }: { tipologiaCodigo: number }) {
   const { produtosPadrao, isLoading } = useProdutosTipologia(tipologiaCodigo);
   const { setSubtotalProdutos } = useFunnel();
@@ -64,7 +86,7 @@ function ProductList({ tipologiaCodigo }: { tipologiaCodigo: number }) {
         {Object.entries(groups).map(([categoria, items]) => (
           <div key={categoria}>
             <p className="text-xs font-bold text-seazone-coral uppercase tracking-wider mb-2">
-              {categoria}
+              {SUBCATEGORIA_NOME[categoria] ?? categoria}
             </p>
             <div className="space-y-1">
               {items.map((item) => {
