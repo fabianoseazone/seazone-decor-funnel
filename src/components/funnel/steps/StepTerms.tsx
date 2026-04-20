@@ -102,7 +102,7 @@ export function StepTerms() {
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground text-sm">Valor total do contrato</span>
               <span className="font-bold text-lg">
-                R$ {calc.total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                R$ {calc.total.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
             </div>
 
@@ -117,7 +117,7 @@ export function StepTerms() {
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Valor (80%)</span>
                   <span className="font-semibold">
-                    R$ {calc.valor80.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    R$ {calc.valor80.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
@@ -127,7 +127,7 @@ export function StepTerms() {
                 <div className="flex justify-between items-center pt-1 border-t border-border">
                   <span className="text-sm font-semibold text-foreground">Parcela mensal*</span>
                   <span className="text-seazone-coral font-bold text-lg">
-                    R$ {calc.parcelaObra.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    R$ {calc.parcelaObra.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
                 <p className="text-[11px] text-muted-foreground flex gap-1 items-start">
@@ -148,19 +148,19 @@ export function StepTerms() {
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Valor (20%)</span>
                   <span className="font-semibold">
-                    R$ {calc.valor20.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    R$ {calc.valor20.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">1ª parcela — {formatMes(calc.parcela1PosEntrega)}</span>
                   <span className="font-semibold">
-                    R$ {calc.parcelaPosEntrega.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    R$ {calc.parcelaPosEntrega.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">2ª parcela — {formatMes(calc.parcela2PosEntrega)}</span>
                   <span className="font-semibold">
-                    R$ {calc.parcelaPosEntrega.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                    R$ {calc.parcelaPosEntrega.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
               </div>
@@ -188,7 +188,7 @@ export function StepTerms() {
                   dot: "bg-seazone-coral",
                   label: "Assinatura do contrato",
                   sub: "Início das parcelas mensais",
-                  detail: `${calc.numParcelas}x R$ ${calc.parcelaObra.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} + IPCA`,
+                  detail: `${calc.numParcelas}x R$ ${calc.parcelaObra.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} + IPCA`,
                 },
                 {
                   dot: "bg-seazone-gold",
@@ -213,7 +213,7 @@ export function StepTerms() {
                   dot: "bg-seazone-success",
                   label: "2 parcelas finais (20%)",
                   sub: `${formatMes(calc.parcela1PosEntrega)} e ${formatMes(calc.parcela2PosEntrega)}`,
-                  detail: `R$ ${calc.parcelaPosEntrega.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} cada`,
+                  detail: `R$ ${calc.parcelaPosEntrega.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} cada`,
                 },
               ].map((step, i, arr) => (
                 <div key={i} className="flex gap-4">

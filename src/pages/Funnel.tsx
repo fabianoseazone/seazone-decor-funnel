@@ -73,7 +73,7 @@ function FunnelContent() {
                 <div className="flex items-center gap-3">
                   <span className="text-sm text-primary-foreground/70">Total:</span>
                   <span className="text-lg font-bold text-seazone-coral">
-                    R$ {getTotalPrice().toLocaleString("pt-BR")}
+                    R$ {getTotalPrice().toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
               </Card>
