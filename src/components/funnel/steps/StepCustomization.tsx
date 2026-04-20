@@ -237,8 +237,8 @@ export function StepCustomization() {
 
   const decorValor = tipologiaSelecionada?.decor_valor ?? 0;
   const admPercent = (tipologiaSelecionada?.adm_percent ?? 0) / 100;
-  const admValor = admPercent * subtotal;
-  const total = subtotal + decorValor + admValor;
+  const seazoneBilling = decorValor + admPercent * subtotal;
+  const total = subtotal + seazoneBilling * 1.1433;
 
   const openSwap = useCallback((item: ProdutoTipologia) => {
     setSelectedItem(item);
