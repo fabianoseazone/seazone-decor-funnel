@@ -39,7 +39,7 @@ function FunnelContent() {
             <div className="flex items-center gap-4">
               <a
                 href="/"
-                className="flex items-center gap-1.5 text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm"
+                className="flex items-center gap-1.5 bg-white/15 hover:bg-white/30 border border-white/30 px-3 py-1.5 rounded-lg text-primary-foreground font-medium transition-colors text-sm"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Voltar ao site
