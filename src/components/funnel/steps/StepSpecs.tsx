@@ -101,7 +101,10 @@ export function StepSpecs() {
   const decorValor = tipologiaSelecionada?.decor_valor ?? 0;
   const admPercent = (tipologiaSelecionada?.adm_percent ?? 0) / 100;
   const admValor = admPercent * subtotalProdutos;
-  const total = subtotalProdutos + decorValor + admValor;
+  const seazoneBilling = decorValor + admValor;
+  const impostoValor = seazoneBilling * 0.1433;
+  const total = subtotalProdutos + seazoneBilling + impostoValor;
+  const parcela = total / 15;
 
   const isPersonalizado = swaps.size > 0 || removidos.size > 0;
   const pkgAbrev = (tipologiaSelecionada as any)?.pacote?.abreviacao ?? "";
@@ -254,12 +257,17 @@ export function StepSpecs() {
         <div className="border-t border-border bg-secondary/30 px-6 py-4">
           <div className="flex justify-between items-center">
             <div>
-              <span className="font-bold text-foreground text-base">Total Decor Lucrativo</span>
-              <p className="text-xs text-muted-foreground">{allItems.length} itens</p>
+              <span className="font-bold text-foreground text-base">Total Estimado</span>
+              <p className="text-xs text-muted-foreground">{allItems.length} itens · sujeito à validação</p>
             </div>
-            <span className="font-bold text-seazone-coral text-xl">
-              R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-            </span>
+            <div className="text-right">
+              <span className="font-bold text-seazone-coral text-xl">
+                R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              </span>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                15x de R$ {parcela.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+              </p>
+            </div>
           </div>
         </div>
       </Card>

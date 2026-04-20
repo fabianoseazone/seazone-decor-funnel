@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { ArrowLeft, Send, CheckCircle2, Building2, MapPin, Package, Loader2 } from "lucide-react";
+import { ArrowLeft, Send, CheckCircle2, Building2, MapPin, Package, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useFunnel } from "@/contexts/FunnelContext";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
 import { DownloadMemorialButton } from "@/components/funnel/DownloadMemorialButton";
 
 const PACOTE_LABEL: Record<string, string> = {
@@ -13,6 +12,26 @@ const PACOTE_LABEL: Record<string, string> = {
   plus: "Plus",
   premium: "Premium",
 };
+
+// Valores fixos — coluna Agrupada/M (6 a 20 unidades)
+const SERVICOS = [
+  { label: "1.1 Medição contrato",         value: 0       },
+  { label: "1.2 Medição executivo",         value: 900     },
+  { label: "1.3 Ligação de energia",        value: 600     },
+  { label: "1.4 Compras",                   value: 6460    },
+  { label: "1.5 Visita presencial",         value: 21000   },
+  { label: "1.6 Frete logística",           value: 2200    },
+  { label: "1.7 Custo fixo — time",         value: 9280    },
+  { label: "1.8 Contabilidade",             value: 65.99   },
+  { label: "1.9 Custos Holding Seazone",    value: 2700    },
+  { label: "1.10 Comissão Comercial Decor", value: 1770    },
+];
+
+const TOTAL_SERVICOS = SERVICOS.reduce((s, i) => s + i.value, 0);
+
+function fmt(v: number) {
+  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
 
 export function StepContract() {
   const {
@@ -27,9 +46,12 @@ export function StepContract() {
 
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [showBreakdown, setShowBreakdown] = useState(false);
 
-  const total = getTotalPrice();
-  const nomePacote = selectedPackage ? (PACOTE_LABEL[selectedPackage] ?? selectedPackage) : "";
+  const orcamento    = getTotalPrice();                         // 1.11 — dinâmico
+  const taxaAdm      = orcamento * 0.06;                       // 1.12 — 6%
+  const total        = TOTAL_SERVICOS + orcamento + taxaAdm;   // valor final
+  const nomePacote   = selectedPackage ? (PACOTE_LABEL[selectedPackage] ?? selectedPackage) : "";
 
 
   const handleSolicitar = async () => {
@@ -145,12 +167,49 @@ export function StepContract() {
               </div>
             </div>
 
+            {/* Detalhamento de Valores */}
+            <div className="border-t border-primary-foreground/10 pt-4">
+              <button
+                onClick={() => setShowBreakdown(v => !v)}
+                className="flex items-center justify-between w-full text-left"
+              >
+                <p className="text-xs text-primary-foreground/50 uppercase tracking-wider font-semibold">
+                  Detalhamento de Valores
+                </p>
+                {showBreakdown
+                  ? <ChevronUp className="w-4 h-4 text-primary-foreground/40" />
+                  : <ChevronDown className="w-4 h-4 text-primary-foreground/40" />}
+              </button>
+
+              {showBreakdown && (
+                <div className="mt-3 space-y-0 text-sm">
+                  {SERVICOS.map((item) => (
+                    <div key={item.label} className="flex justify-between py-1.5 border-b border-primary-foreground/5">
+                      <span className="text-primary-foreground/60">{item.label}</span>
+                      <span className="text-primary-foreground/80 font-medium tabular-nums">{fmt(item.value)}</span>
+                    </div>
+                  ))}
+                  <div className="flex justify-between py-1.5 border-b border-primary-foreground/5">
+                    <span className="text-primary-foreground/60">1.11 Orçamento da unidade</span>
+                    <span className="text-primary-foreground/80 font-medium tabular-nums">{fmt(orcamento)}</span>
+                  </div>
+                  <div className="flex justify-between py-1.5 border-b border-primary-foreground/10">
+                    <span className="text-primary-foreground/60">1.12 Taxa adm. decor (6%)</span>
+                    <span className="text-primary-foreground/80 font-medium tabular-nums">{fmt(taxaAdm)}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="pt-2">
               <p className="text-xs text-primary-foreground/50 uppercase tracking-wider mb-1">Total estimado</p>
               <p className="text-3xl font-bold text-seazone-coral">
-                R$ {total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                {fmt(total)}
               </p>
-              <p className="text-xs text-primary-foreground/40 mt-1">
+              <p className="text-sm text-primary-foreground/70 mt-1 font-medium">
+                15x de {fmt(total / 15)}
+              </p>
+              <p className="text-xs text-primary-foreground/40 mt-0.5">
                 Sujeito à validação do comercial
               </p>
             </div>

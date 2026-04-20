@@ -6,6 +6,7 @@ import { useFunnel } from "@/contexts/FunnelContext";
 import { useProdutosTipologia } from "@/hooks/useProdutosTipologia";
 import { MemorialDocument } from "./MemorialPDF";
 import type { MemorialData } from "./MemorialPDF";
+import { toast } from "sonner";
 
 const SUBCATEGORIA_NOME: Record<string, string> = {
   "2.1.1": "Painéis e Nichos",
@@ -28,6 +29,23 @@ const SUBCATEGORIA_NOME: Record<string, string> = {
   "2.2.9": "RRT",
   "2.2.10": "Marmoraria",
 };
+
+async function fetchBase64(url: string | null): Promise<string | null> {
+  if (!url) return null;
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return null;
+  }
+}
 
 export function DownloadMemorialButton({ variant = "glass" }: { variant?: string }) {
   const {
@@ -76,6 +94,15 @@ export function DownloadMemorialButton({ variant = "glass" }: { variant?: string
         groupsMap[key].push(item);
       });
 
+      // Pre-fetch all images as base64 to avoid CORS inside @react-pdf/renderer
+      const imageCache = new Map<string | null, string | null>();
+      const uniqueUrls = [...new Set(allItems.map((i) => (i as any).produto?.imagem_url ?? null))];
+      await Promise.all(
+        uniqueUrls.map(async (url) => {
+          imageCache.set(url, await fetchBase64(url));
+        })
+      );
+
       const decorValor = tipologiaSelecionada?.decor_valor ?? 0;
       const admPct = tipologiaSelecionada?.adm_percent ?? 0;
       const admValor = (admPct / 100) * subtotalProdutos;
@@ -96,7 +123,7 @@ export function DownloadMemorialButton({ variant = "glass" }: { variant?: string
           nome: SUBCATEGORIA_NOME[key] ?? key,
           items: items.map((item: any) => ({
             nome: item.produto?.nome ?? `Produto ${item.produto_codigo}`,
-            imagemUrl: item.produto?.imagem_url ?? null,
+            imagemBase64: imageCache.get(item.produto?.imagem_url ?? null) ?? null,
             quantidade: item.quantidade ?? 1,
             isSwapped: !!item._isSwapped,
             isAdded: !!item._isAdded,
@@ -126,8 +153,11 @@ export function DownloadMemorialButton({ variant = "glass" }: { variant?: string
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+
+      toast.success("Memorial gerado com sucesso!");
     } catch (err) {
       console.error("Erro ao gerar PDF:", err);
+      toast.error("Erro ao gerar o memorial. Tente novamente.");
     } finally {
       setGenerating(false);
     }

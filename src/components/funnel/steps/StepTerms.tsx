@@ -94,7 +94,7 @@ export function StepTerms() {
               </div>
               <div>
                 <h3 className="font-display font-bold text-base">Resumo Financeiro</h3>
-                <p className="text-xs text-muted-foreground">Valores sujeitos à correção pelo IGPM</p>
+                <p className="text-xs text-muted-foreground">Valores sujeitos à correção pelo IPCA</p>
               </div>
             </div>
 
@@ -132,7 +132,7 @@ export function StepTerms() {
                 </div>
                 <p className="text-[11px] text-muted-foreground flex gap-1 items-start">
                   <Info className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                  *Valor base sem correção. Parcelas sujeitas à correção mensal pelo IGPM.
+                  *Valor base sem correção. Parcelas sujeitas à correção mensal pelo IPCA.
                 </p>
               </div>
             </div>
@@ -188,7 +188,7 @@ export function StepTerms() {
                   dot: "bg-seazone-coral",
                   label: "Assinatura do contrato",
                   sub: "Início das parcelas mensais",
-                  detail: `${calc.numParcelas}x R$ ${calc.parcelaObra.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} + IGPM`,
+                  detail: `${calc.numParcelas}x R$ ${calc.parcelaObra.toLocaleString("pt-BR", { minimumFractionDigits: 2 })} + IPCA`,
                 },
                 {
                   dot: "bg-seazone-gold",
@@ -237,15 +237,15 @@ export function StepTerms() {
         </Card>
       </div>
 
-      {/* IGPM note */}
+      {/* IPCA note */}
       <Card variant="elevated" className="border-amber-200/50 bg-amber-50/30 dark:bg-amber-950/10">
         <CardContent className="p-4">
           <div className="flex gap-3 items-start">
             <Info className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
             <div className="text-sm">
-              <p className="font-semibold text-foreground mb-1">Correção monetária pelo IGPM</p>
+              <p className="font-semibold text-foreground mb-1">Correção monetária pelo IPCA</p>
               <p className="text-muted-foreground">
-                As parcelas são corrigidas mensalmente pelo IGPM (Índice Geral de Preços do Mercado).
+                As parcelas são corrigidas mensalmente pelo IPCA (Índice Nacional de Preços ao Consumidor Amplo).
                 Os valores apresentados são a base de cálculo sem a correção acumulada.
                 Não há juros — apenas a atualização pelo índice oficial.
               </p>
