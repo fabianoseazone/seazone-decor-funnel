@@ -28,16 +28,23 @@ export function StepContract() {
     ownerName,
     ownerCpf,
     prevStep,
+    swaps,
+    removidos,
+    adicionados,
   } = useFunnel();
 
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [showBreakdown, setShowBreakdown] = useState(false);
 
-  const orcamento    = getTotalPrice();                // 1.11 — dinâmico
-  const taxaAdm      = orcamento * 0.06;             // 1.12 — 6%
-  const total        = calcTotalContrato(orcamento); // mesma fórmula do StepTerms
+  const orcamento    = getTotalPrice();
+  const taxaAdm      = orcamento * 0.06;
+  const total        = calcTotalContrato(orcamento);
   const nomePacote   = selectedPackage ? (PACOTE_LABEL[selectedPackage] ?? selectedPackage) : "";
+  const isPersonalizado = swaps.size > 0 || removidos.size > 0 || adicionados.size > 0;
+  const descricaoTipologia = tipologiaSelecionada?.descricao
+    ? tipologiaSelecionada.descricao + (isPersonalizado ? "_Personalizado" : "")
+    : null;
 
 
   const handleSolicitar = async () => {
@@ -144,9 +151,9 @@ export function StepContract() {
                 <div>
                   <p className="text-xs text-primary-foreground/50 uppercase tracking-wider">Pacote</p>
                   <p className="font-semibold text-primary-foreground">{nomePacote}</p>
-                  {tipologiaSelecionada?.descricao && (
+                  {descricaoTipologia && (
                     <p className="text-sm text-primary-foreground/60">
-                      {tipologiaSelecionada.descricao}
+                      {descricaoTipologia}
                     </p>
                   )}
                 </div>
