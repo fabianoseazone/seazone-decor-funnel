@@ -198,6 +198,8 @@ export function StepCustomization() {
 
   const [selectedItem, setSelectedItem] = useState<ProdutoTipologia | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [imagesReady, setImagesReady] = useState(false);
+  const [loadProgress, setLoadProgress] = useState(0);
 
   const tipologiaCodigo = tipologiaSelecionada?.codigo ?? null;
   const empCodigo = tipologiaSelecionada?.empreendimento_codigo ?? null;
@@ -205,6 +207,39 @@ export function StepCustomization() {
 
   const { produtosPadrao, produtosAdicionais, isLoading } = useProdutosTipologia(tipologiaCodigo);
   const { data: substitutos = [], isLoading: loadingSubstitutos } = useProdutosSubstitutos(empCodigo, tipoLetra);
+
+  // Wait for all product images to be loaded before showing the page.
+  // Safe from infinite loops because useProdutosTipologia now returns stable references via useMemo.
+  useEffect(() => {
+    if (isLoading) return;
+    if (!produtosPadrao.length) { setImagesReady(true); return; }
+
+    let cancelled = false;
+    let loaded = 0;
+    const total = produtosPadrao.length;
+
+    const done = () => {
+      if (cancelled) return;
+      loaded++;
+      if (loaded % 5 === 0 || loaded >= total)
+        setLoadProgress(Math.round((loaded / total) * 100));
+      if (loaded >= total) setImagesReady(true);
+    };
+
+    // Safety timeout — show the page even if some images are still loading
+    const timer = setTimeout(() => { if (!cancelled) setImagesReady(true); }, 5000);
+
+    produtosPadrao.forEach(p => {
+      const url = getDriveImageUrl((p.produto as any)?.imagem_url);
+      if (!url) { done(); return; }
+      const img = new Image();
+      img.onload = done;
+      img.onerror = done;
+      img.src = url;
+    });
+
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [produtosPadrao, isLoading]);
 
   // Active standard items: not removed, with swaps applied
   const activeItems = useMemo(() =>
@@ -258,10 +293,23 @@ export function StepCustomization() {
     setSheetOpen(false);
   }, [selectedItem, clearSwap]);
 
-  if (isLoading) {
+  if (isLoading || !imagesReady) {
     return (
-      <div className="flex justify-center py-20">
-        <Loader2 className="w-8 h-8 animate-spin text-seazone-coral" />
+      <div className="flex flex-col items-center justify-center py-32 gap-5">
+        <Loader2 className="w-10 h-10 animate-spin text-seazone-coral" />
+        {!isLoading && produtosPadrao.length > 0 && (
+          <>
+            <div className="w-64 h-2 bg-secondary rounded-full overflow-hidden">
+              <div
+                className="h-full bg-seazone-coral rounded-full transition-all duration-300"
+                style={{ width: `${loadProgress}%` }}
+              />
+            </div>
+            <p className="text-sm text-muted-foreground tabular-nums">
+              Preparando imagens… {loadProgress}%
+            </p>
+          </>
+        )}
       </div>
     );
   }
