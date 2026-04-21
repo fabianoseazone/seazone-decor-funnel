@@ -69,7 +69,7 @@ function FunnelContent() {
               )}
             </div>
             
-            {selectedPackage && (
+            {selectedPackage && currentStep > 0 && (
               <Card variant="glass" className="py-2 px-4">
                 <div className="flex items-center gap-3">
                   <span className="text-sm text-primary-foreground/70">Total:</span>
