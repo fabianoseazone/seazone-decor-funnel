@@ -57,9 +57,10 @@ const s = StyleSheet.create({
     backgroundColor: NAVY,
     alignItems: "center",
     justifyContent: "center",
-    padding: 10,
+    padding: 8,
   },
-  logoImg: { width: 60, height: 60, objectFit: "contain" },
+  logoImg:      { width: 58, height: 58, objectFit: "contain" },
+  logoDecorTxt: { color: "rgba(255,255,255,0.7)", fontSize: 7, letterSpacing: 2, marginTop: 3 },
   titleBox: {
     flex: 1,
     backgroundColor: CORAL,
@@ -215,8 +216,8 @@ export function MemorialDocument({ data }: { data: MemorialData }) {
           <View style={s.logoBox}>
             {data.logoBase64
               ? <Image src={data.logoBase64} style={s.logoImg} />
-              : <Text style={{ color: "white", fontFamily: "Helvetica-Bold", fontSize: 18 }}>SZ</Text>
-            }
+              : null}
+            <Text style={s.logoDecorTxt}>DECOR</Text>
           </View>
           <View style={s.titleBox}>
             <Text style={s.titleText}>MEMORIAL DESCRITIVO POR TIPOLOGIA</Text>
@@ -231,15 +232,8 @@ export function MemorialDocument({ data }: { data: MemorialData }) {
           <InfoRow label="Tipologia"      value={tipologiaComposta   || "—"} />
           <InfoRow label="Mês Correção"   value={data.mesCorrecao}           />
           <InfoRow label="Índice"         value="IPCA"                       />
-          {/* Hóspedes + Pacote on same row */}
-          <View style={s.iRow}>
-            <Text style={s.iLabelHalf}>Hóspedes</Text>
-            <Text style={s.iValueHalf}>
-              {data.numHospedes ? String(data.numHospedes) : "—"}
-            </Text>
-            <Text style={s.iLabel2}>Pacote</Text>
-            <Text style={s.iValue2}>{data.pacote || "—"}</Text>
-          </View>
+          <InfoRow label="Hóspedes"       value={data.numHospedes ? String(data.numHospedes) : "—"} />
+          <InfoRow label="Pacote"         value={data.pacote || "—"} />
           <InfoRow label="Data de geração" value={data.dataGeracao} />
           <InfoRow label="Valor Total"     value={fmt(data.total)} last />
         </View>
