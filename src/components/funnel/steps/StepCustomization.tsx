@@ -198,6 +198,7 @@ export function StepCustomization() {
 
   const [selectedItem, setSelectedItem] = useState<ProdutoTipologia | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [imagesReady, setImagesReady] = useState(false);
 
   const tipologiaCodigo = tipologiaSelecionada?.codigo ?? null;
   const empCodigo = tipologiaSelecionada?.empreendimento_codigo ?? null;
@@ -205,6 +206,29 @@ export function StepCustomization() {
 
   const { produtosPadrao, produtosAdicionais, isLoading } = useProdutosTipologia(tipologiaCodigo);
   const { data: substitutos = [], isLoading: loadingSubstitutos } = useProdutosSubstitutos(empCodigo, tipoLetra);
+
+  // Gate: wait for all product images to load (or timeout) before showing the page
+  useEffect(() => {
+    if (isLoading) { setImagesReady(false); return; }
+    if (!produtosPadrao.length) { setImagesReady(true); return; }
+
+    setImagesReady(false);
+    let cancelled = false;
+    let remaining = produtosPadrao.length;
+    const done = () => { if (!cancelled && --remaining <= 0) setImagesReady(true); };
+    const timer = setTimeout(() => { if (!cancelled) setImagesReady(true); }, 5000);
+
+    produtosPadrao.forEach(p => {
+      const url = getDriveImageUrl((p.produto as any)?.imagem_url);
+      if (!url) { done(); return; }
+      const img = new Image();
+      img.onload = done;
+      img.onerror = done;
+      img.src = url;
+    });
+
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [produtosPadrao, isLoading]);
 
   // Active standard items: not removed, with swaps applied
   const activeItems = useMemo(() =>
@@ -258,10 +282,13 @@ export function StepCustomization() {
     setSheetOpen(false);
   }, [selectedItem, clearSwap]);
 
-  if (isLoading) {
+  if (isLoading || !imagesReady) {
     return (
-      <div className="flex justify-center py-20">
-        <Loader2 className="w-8 h-8 animate-spin text-seazone-coral" />
+      <div className="flex flex-col items-center justify-center py-32 gap-3">
+        <Loader2 className="w-10 h-10 animate-spin text-seazone-coral" />
+        <p className="text-sm text-muted-foreground">
+          {isLoading ? "Carregando produtos..." : "Carregando imagens..."}
+        </p>
       </div>
     );
   }

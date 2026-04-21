@@ -378,6 +378,23 @@ export function StepPackageSelection() {
     setTipologiaSelecionada(tip);
   };
 
+  // Preload sz=w200 images (used in StepCustomization) as soon as a package is selected
+  const { produtosPadrao: preloadProdutos } = useProdutosTipologia(tipologiaSelecionada?.codigo ?? null);
+  useEffect(() => {
+    if (!preloadProdutos.length) return;
+    preloadProdutos.forEach(p => {
+      const raw = (p.produto as any)?.imagem_url as string | null | undefined;
+      if (!raw) return;
+      const match = raw.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (!match) return;
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = `https://drive.google.com/thumbnail?id=${match[1]}&sz=w200`;
+      document.head.appendChild(link);
+    });
+  }, [preloadProdutos]);
+
   // Auto-select recommended package when coming from the prospect quiz
   useEffect(() => {
     if (!tipologias?.length || !recommendedPackageAbrev || tipologiaSelecionada) return;

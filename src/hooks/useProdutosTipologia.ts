@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { ProdutoTipologia } from '@/types/catalog';
@@ -40,22 +39,6 @@ export function useProdutosTipologia(tipologiaCodigo: number | null): UseProduto
   });
 
   const data = query.data;
-
-  // Preload images in all sizes used across the funnel so they're ready before the user navigates
-  useEffect(() => {
-    if (!data) return;
-    data.forEach(p => {
-      const raw = (p.produto as any)?.imagem_url as string | null | undefined;
-      if (!raw) return;
-      const match = raw.match(/\/d\/([a-zA-Z0-9_-]+)/);
-      if (!match) return;
-      const id = match[1];
-      ['w120', 'w200'].forEach(sz => {
-        const img = new Image();
-        img.src = `https://drive.google.com/thumbnail?id=${id}&sz=${sz}`;
-      });
-    });
-  }, [data]);
 
   return {
     ...query,
