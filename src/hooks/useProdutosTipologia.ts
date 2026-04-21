@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import type { ProdutoTipologia } from '@/types/catalog';
@@ -40,9 +41,13 @@ export function useProdutosTipologia(tipologiaCodigo: number | null): UseProduto
 
   const data = query.data;
 
+  // Stable references — prevents useEffect dependency loops in consumers
+  const produtosPadrao = useMemo(() => data?.filter(p => !p.item_adicional) ?? [], [data]);
+  const produtosAdicionais = useMemo(() => data?.filter(p => p.item_adicional) ?? [], [data]);
+
   return {
     ...query,
-    produtosPadrao:     data?.filter(p => !p.item_adicional) ?? [],
-    produtosAdicionais: data?.filter(p =>  p.item_adicional) ?? [],
+    produtosPadrao,
+    produtosAdicionais,
   };
 }

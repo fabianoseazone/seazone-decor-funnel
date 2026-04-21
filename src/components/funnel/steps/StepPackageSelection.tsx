@@ -328,6 +328,19 @@ function PackageCard({ tip, isSelected, isRecommended, onSelect }: {
     return subtotal + (decorValor + admPercent * subtotal) * 1.1433;
   }, [produtosPadrao, tip.decor_valor, tip.adm_percent]);
 
+  // Preload sz=w120 thumbnails as soon as card data arrives
+  useEffect(() => {
+    if (!produtosPadrao.length) return;
+    produtosPadrao.forEach(p => {
+      const raw = (p.produto as any)?.imagem_url as string | null | undefined;
+      if (!raw) return;
+      const match = raw.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if (!match) return;
+      const img = new Image();
+      img.src = `https://drive.google.com/thumbnail?id=${match[1]}&sz=w120`;
+    });
+  }, [produtosPadrao]);
+
   return (
     <Card
       variant={isSelected ? "selected" : "elevated"}
