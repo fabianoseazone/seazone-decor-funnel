@@ -10,6 +10,7 @@ import { StepContract } from "@/components/funnel/steps/StepContract";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Building2, MapPin, Calendar, ArrowLeft } from "lucide-react";
+import { calcTotalContrato } from "@/data/servicosDecor";
 
 function FunnelContent() {
   const { currentStep, selectedUnit, getTotalPrice, selectedPackage } = useFunnel();
@@ -73,7 +74,7 @@ function FunnelContent() {
                 <div className="flex items-center gap-3">
                   <span className="text-sm text-primary-foreground/70">Total:</span>
                   <span className="text-lg font-bold text-seazone-coral">
-                    R$ {getTotalPrice().toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    R$ {calcTotalContrato(getTotalPrice()).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
               </Card>
