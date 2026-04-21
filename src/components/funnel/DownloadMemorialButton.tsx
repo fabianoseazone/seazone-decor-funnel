@@ -4,7 +4,8 @@ import { Download, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFunnel } from "@/contexts/FunnelContext";
 import { useProdutosTipologia } from "@/hooks/useProdutosTipologia";
-import { calcTotalContrato } from "@/data/servicosDecor";
+import { calcTotalContrato, TOTAL_SERVICOS } from "@/data/servicosDecor";
+import { getDriveImageUrl } from "@/lib/driveImage";
 import { MemorialDocument } from "./MemorialPDF";
 import type { MemorialData } from "./MemorialPDF";
 import { toast } from "sonner";
@@ -96,17 +97,21 @@ export function DownloadMemorialButton({ variant = "glass" }: { variant?: string
       });
 
       // Pre-fetch all images as base64 to avoid CORS inside @react-pdf/renderer
+      // Uses proxy URL so the image is served from Vercel CDN (no Drive CORS issues)
       const imageCache = new Map<string | null, string | null>();
-      const uniqueUrls = [...new Set(allItems.map((i) => (i as any).produto?.imagem_url ?? null))];
+      const uniqueRawUrls = [...new Set(allItems.map((i) => (i as any).produto?.imagem_url ?? null))];
       await Promise.all(
-        uniqueUrls.map(async (url) => {
-          imageCache.set(url, await fetchBase64(url));
+        uniqueRawUrls.map(async (rawUrl) => {
+          const proxyUrl = getDriveImageUrl(rawUrl, 'w200');
+          const base64 = await fetchBase64(proxyUrl ? `${window.location.origin}${proxyUrl}` : null);
+          imageCache.set(rawUrl, base64);
         })
       );
 
+      const taxaAdm = subtotalProdutos * 0.06;
       const total = calcTotalContrato(subtotalProdutos);
 
-      const isPersonalizado = swaps.size > 0 || removidos.size > 0;
+      const isPersonalizado = swaps.size > 0 || removidos.size > 0 || adicionados.size > 0;
 
       const data: MemorialData = {
         empreendimento: selectedUnit?.spot ?? "",
@@ -126,10 +131,8 @@ export function DownloadMemorialButton({ variant = "glass" }: { variant?: string
           })),
         })),
         valorProdutos: subtotalProdutos,
-        taxaDecor: decorValor,
-        admPercent: admPct,
-        admValor,
-        impostoValor,
+        custosFixos: TOTAL_SERVICOS,
+        taxaAdm,
         total,
         isPersonalizado,
       };

@@ -33,10 +33,8 @@ export interface MemorialData {
   dataGeracao: string;
   grupos: MemorialGrupo[];
   valorProdutos: number;
-  taxaDecor: number;
-  admPercent: number;
-  admValor: number;
-  impostoValor: number;
+  custosFixos: number;
+  taxaAdm: number;
   total: number;
   isPersonalizado: boolean;
 }
@@ -244,10 +242,9 @@ export function MemorialDocument({ data }: { data: MemorialData }) {
           <View style={s.finHeader}>
             <Text style={s.finHeaderText}>RESUMO FINANCEIRO</Text>
           </View>
-          <FinRow label="Valor dos produtos" value={fmt(data.valorProdutos)} />
-          <FinRow label="Taxa Decor (custos operacionais)" value={fmt(data.taxaDecor)} />
-          <FinRow label={`Taxa Administração (${data.admPercent}%)`} value={fmt(data.admValor)} />
-          <FinRow label="Imposto de Serviço (14,33%)" value={fmt(data.impostoValor)} />
+          <FinRow label="1.11 Orçamento da unidade (produtos)" value={fmt(data.valorProdutos)} />
+          <FinRow label="1.1–1.10 Custos operacionais Seazone" value={fmt(data.custosFixos)} />
+          <FinRow label="1.12 Taxa de administração decor (6%)" value={fmt(data.taxaAdm)} />
           <View style={s.finTotal}>
             <View>
               <Text style={s.finTotalLabel}>TOTAL ESTIMADO</Text>
