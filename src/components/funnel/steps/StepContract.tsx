@@ -158,9 +158,9 @@ export function StepContract() {
                 <div>
                   <p className="text-xs text-primary-foreground/50 uppercase tracking-wider">Pacote</p>
                   <p className="font-semibold text-primary-foreground">{nomePacote}</p>
-                  {tipologiaSelecionada && (
+                  {tipologiaSelecionada?.descricao && (
                     <p className="text-sm text-primary-foreground/60">
-                      Tipologia {tipologiaSelecionada.tipo_letra} · {tipologiaSelecionada.num_hospedes} hóspedes
+                      {tipologiaSelecionada.descricao}
                     </p>
                   )}
                 </div>

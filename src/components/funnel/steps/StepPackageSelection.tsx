@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Package, ArrowRight, Loader2, Settings2, ChevronLeft, ChevronRight, ImageOff } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -320,6 +320,14 @@ function PackageCard({ tip, isSelected, isRecommended, onSelect }: {
   const nome = PACOTE_LABEL[abrev] ?? tip.descricao;
   const { produtosPadrao, isLoading: loadingProdutos } = useProdutosTipologia(tip.codigo);
 
+  const totalPrice = useMemo(() => {
+    if (!produtosPadrao.length) return null;
+    const subtotal = produtosPadrao.reduce((sum, p) => sum + (p.valor_unitario ?? 0) * (p.quantidade ?? 1), 0);
+    const decorValor = tip.decor_valor ?? 0;
+    const admPercent = (tip.adm_percent ?? 0) / 100;
+    return subtotal + (decorValor + admPercent * subtotal) * 1.1433;
+  }, [produtosPadrao, tip.decor_valor, tip.adm_percent]);
+
   return (
     <Card
       variant={isSelected ? "selected" : "elevated"}
@@ -350,7 +358,14 @@ function PackageCard({ tip, isSelected, isRecommended, onSelect }: {
           {loadingProdutos ? (
             <Loader2 className="w-4 h-4 animate-spin mx-auto text-muted-foreground" />
           ) : (
-            <p className="text-sm font-semibold text-foreground py-1">{produtosPadrao.length} itens incluídos</p>
+            <>
+              <p className="text-sm text-muted-foreground">{produtosPadrao.length} itens incluídos</p>
+              {totalPrice != null && (
+                <p className="text-seazone-coral font-bold text-xl mt-0.5">
+                  R$ {totalPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+              )}
+            </>
           )}
         </div>
 

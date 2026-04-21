@@ -204,7 +204,7 @@ export function StepTerms() {
                 },
                 {
                   dot: "bg-blue-500",
-                  label: "Início da decoração",
+                  label: "Início da Decor",
                   sub: formatMes(calc.decorInicio),
                   detail: "Execução pelo time Seazone",
                   icon: <Hammer className="w-3 h-3" />,
