@@ -4,7 +4,7 @@ import { Download, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFunnel } from "@/contexts/FunnelContext";
 import { useProdutosTipologia } from "@/hooks/useProdutosTipologia";
-import { calcTotalContrato, TOTAL_SERVICOS } from "@/data/servicosDecor";
+import { calcTotalContrato } from "@/data/servicosDecor";
 import { getDriveImageUrl } from "@/lib/driveImage";
 import { MemorialDocument } from "./MemorialPDF";
 import type { MemorialData } from "./MemorialPDF";
@@ -108,10 +108,11 @@ export function DownloadMemorialButton({ variant = "glass" }: { variant?: string
         })
       );
 
-      const taxaAdm = subtotalProdutos * 0.06;
       const total = calcTotalContrato(subtotalProdutos);
-
       const isPersonalizado = swaps.size > 0 || removidos.size > 0 || adicionados.size > 0;
+
+      const hoje = new Date();
+      const mesCorrecao = `01/${String(hoje.getMonth() + 1).padStart(2, "0")}/${hoje.getFullYear()}`;
 
       const data: MemorialData = {
         empreendimento: selectedUnit?.spot ?? "",
@@ -119,20 +120,19 @@ export function DownloadMemorialButton({ variant = "glass" }: { variant?: string
         tipologia: tipologiaSelecionada?.tipo_letra ?? "",
         pacote: (tipologiaSelecionada as any)?.pacote?.abreviacao ?? "",
         numHospedes: tipologiaSelecionada?.num_hospedes ?? 0,
-        dataGeracao: new Date().toLocaleDateString("pt-BR"),
+        dataGeracao: hoje.toLocaleDateString("pt-BR"),
+        mesCorrecao,
         grupos: Object.entries(groupsMap).map(([key, items]) => ({
           nome: SUBCATEGORIA_NOME[key] ?? key,
           items: items.map((item: any) => ({
             nome: item.produto?.nome ?? `Produto ${item.produto_codigo}`,
             imagemBase64: imageCache.get(item.produto?.imagem_url ?? null) ?? null,
             quantidade: item.quantidade ?? 1,
+            valorUnitario: item.valor_unitario ?? 0,
             isSwapped: !!item._isSwapped,
             isAdded: !!item._isAdded,
           })),
         })),
-        valorProdutos: subtotalProdutos,
-        custosFixos: TOTAL_SERVICOS,
-        taxaAdm,
         total,
         isPersonalizado,
       };
