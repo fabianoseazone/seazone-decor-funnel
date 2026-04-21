@@ -6,28 +6,13 @@ import { Button } from "@/components/ui/button";
 import { useFunnel } from "@/contexts/FunnelContext";
 import { supabase } from "@/integrations/supabase/client";
 import { DownloadMemorialButton } from "@/components/funnel/DownloadMemorialButton";
+import { SERVICOS, TOTAL_SERVICOS, calcTotalContrato } from "@/data/servicosDecor";
 
 const PACOTE_LABEL: Record<string, string> = {
   essential: "Essential",
   plus: "Plus",
   premium: "Premium",
 };
-
-// Valores fixos — coluna Agrupada/M (6 a 20 unidades)
-const SERVICOS = [
-  { label: "1.1 Medição contrato",         value: 0       },
-  { label: "1.2 Medição executivo",         value: 900     },
-  { label: "1.3 Ligação de energia",        value: 600     },
-  { label: "1.4 Compras",                   value: 6460    },
-  { label: "1.5 Visita presencial",         value: 21000   },
-  { label: "1.6 Frete logística",           value: 2200    },
-  { label: "1.7 Custo fixo — time",         value: 9280    },
-  { label: "1.8 Contabilidade",             value: 65.99   },
-  { label: "1.9 Custos Holding Seazone",    value: 2700    },
-  { label: "1.10 Comissão Comercial Decor", value: 1770    },
-];
-
-const TOTAL_SERVICOS = SERVICOS.reduce((s, i) => s + i.value, 0);
 
 function fmt(v: number) {
   return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -48,9 +33,9 @@ export function StepContract() {
   const [sent, setSent] = useState(false);
   const [showBreakdown, setShowBreakdown] = useState(false);
 
-  const orcamento    = getTotalPrice();                         // 1.11 — dinâmico
-  const taxaAdm      = orcamento * 0.06;                       // 1.12 — 6%
-  const total        = TOTAL_SERVICOS + orcamento + taxaAdm;   // valor final
+  const orcamento    = getTotalPrice();                // 1.11 — dinâmico
+  const taxaAdm      = orcamento * 0.06;             // 1.12 — 6%
+  const total        = calcTotalContrato(orcamento); // mesma fórmula do StepTerms
   const nomePacote   = selectedPackage ? (PACOTE_LABEL[selectedPackage] ?? selectedPackage) : "";
 
 

@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useFunnel } from "@/contexts/FunnelContext";
 import { useEmpreendimento } from "@/hooks/useEmpreendimento";
+import { calcTotalContrato } from "@/data/servicosDecor";
 
 function addMonths(date: Date, months: number): Date {
   const d = new Date(date);
@@ -30,7 +31,7 @@ export function StepTerms() {
   const { data: empreendimento } = useEmpreendimento(empCodigo);
 
   const calc = useMemo(() => {
-    const total = getTotalPrice();
+    const total = calcTotalContrato(getTotalPrice());
     const hoje = new Date();
     hoje.setDate(1);
 
