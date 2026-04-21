@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { useFunnel } from "@/contexts/FunnelContext";
 import { useProdutosTipologia } from "@/hooks/useProdutosTipologia";
 import { useProdutosSubstitutos } from "@/hooks/useProdutosSubstitutos";
+import { getDriveImageUrl } from "@/lib/driveImage";
 import type { ProdutoTipologia } from "@/types/catalog";
 
 const SUBCATEGORIA_NOME: Record<string, string> = {
@@ -31,14 +32,6 @@ const SUBCATEGORIA_NOME: Record<string, string> = {
   "2.2.9": "RRT",
   "2.2.10": "Marmoraria",
 };
-
-/** Converts a Google Drive view/share URL to a displayable thumbnail URL. */
-function getDriveImageUrl(url: string | null | undefined): string | null {
-  if (!url) return null;
-  const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-  if (!match) return url; // not a Drive URL, return as-is
-  return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w200`;
-}
 
 // ─── Substitution Sheet ──────────────────────────────────────────────────────
 

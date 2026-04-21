@@ -7,14 +7,8 @@ import { useFunnel } from "@/contexts/FunnelContext";
 import { useTipologiasDisponiveis } from "@/hooks/useTipologiasDisponiveis";
 import { useProdutosTipologia } from "@/hooks/useProdutosTipologia";
 import { useEmpreendimentoRenders } from "@/hooks/useEmpreendimentoRenders";
+import { getDriveImageUrl } from "@/lib/driveImage";
 import type { ProdutoTipologia } from "@/types/catalog";
-
-function getDriveImageUrl(url: string | null | undefined): string | null {
-  if (!url) return null;
-  const match = url.match(/\/d\/([^/]+)\//);
-  if (match) return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w120`;
-  return url;
-}
 
 const PACOTE_LABEL: Record<string, string> = {
   ES: "Essential", PL: "Plus", PR: "Premium", HD1: "HD1", AM: "Ampliada",
@@ -90,7 +84,7 @@ function ProductList({ tipologiaCodigo }: { tipologiaCodigo: number }) {
             </p>
             <div className="space-y-1">
               {items.map((item) => {
-                const imgUrl = getDriveImageUrl(item.produto?.imagem_url);
+                const imgUrl = getDriveImageUrl(item.produto?.imagem_url, 'w120');
                 return (
                   <div
                     key={item.id}
@@ -328,16 +322,14 @@ function PackageCard({ tip, isSelected, isRecommended, onSelect }: {
     return subtotal + (decorValor + admPercent * subtotal) * 1.1433;
   }, [produtosPadrao, tip.decor_valor, tip.adm_percent]);
 
-  // Preload sz=w120 thumbnails as soon as card data arrives
+  // Preload w120 thumbnails as soon as card data arrives
   useEffect(() => {
     if (!produtosPadrao.length) return;
     produtosPadrao.forEach(p => {
-      const raw = (p.produto as any)?.imagem_url as string | null | undefined;
-      if (!raw) return;
-      const match = raw.match(/\/d\/([a-zA-Z0-9_-]+)/);
-      if (!match) return;
+      const url = getDriveImageUrl((p.produto as any)?.imagem_url, 'w120');
+      if (!url) return;
       const img = new Image();
-      img.src = `https://drive.google.com/thumbnail?id=${match[1]}&sz=w120`;
+      img.src = url;
     });
   }, [produtosPadrao]);
 
@@ -406,19 +398,17 @@ export function StepPackageSelection() {
     setTipologiaSelecionada(tip);
   };
 
-  // Preload sz=w200 images (used in StepCustomization) as soon as a package is selected
+  // Preload w200 images (used in StepCustomization) via proxy as soon as a package is selected
   const { produtosPadrao: preloadProdutos } = useProdutosTipologia(tipologiaSelecionada?.codigo ?? null);
   useEffect(() => {
     if (!preloadProdutos.length) return;
     preloadProdutos.forEach(p => {
-      const raw = (p.produto as any)?.imagem_url as string | null | undefined;
-      if (!raw) return;
-      const match = raw.match(/\/d\/([a-zA-Z0-9_-]+)/);
-      if (!match) return;
+      const url = getDriveImageUrl((p.produto as any)?.imagem_url, 'w200');
+      if (!url) return;
       const link = document.createElement('link');
       link.rel = 'preload';
       link.as = 'image';
-      link.href = `https://drive.google.com/thumbnail?id=${match[1]}&sz=w200`;
+      link.href = url;
       document.head.appendChild(link);
     });
   }, [preloadProdutos]);
