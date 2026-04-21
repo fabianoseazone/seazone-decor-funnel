@@ -9,6 +9,7 @@ import { useFunnel } from "@/contexts/FunnelContext";
 import { useProdutosTipologia } from "@/hooks/useProdutosTipologia";
 import { useProdutosSubstitutos } from "@/hooks/useProdutosSubstitutos";
 import { getDriveImageUrl } from "@/lib/driveImage";
+import { calcTotalContrato } from "@/data/servicosDecor";
 import type { ProdutoTipologia } from "@/types/catalog";
 
 const SUBCATEGORIA_NOME: Record<string, string> = {
@@ -266,7 +267,8 @@ export function StepCustomization() {
   const decorValor = tipologiaSelecionada?.decor_valor ?? 0;
   const admPercent = (tipologiaSelecionada?.adm_percent ?? 0) / 100;
   const seazoneBilling = decorValor + admPercent * subtotal;
-  const total = subtotal + seazoneBilling * 1.1433;
+  const orcamento = subtotal + seazoneBilling * 1.1433;
+  const total = calcTotalContrato(orcamento);
 
   const openSwap = useCallback((item: ProdutoTipologia) => {
     setSelectedItem(item);
