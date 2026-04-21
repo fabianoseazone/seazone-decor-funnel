@@ -51,16 +51,15 @@ const s = StyleSheet.create({
   },
 
   // ── Header ──────────────────────────────────────
-  header: { flexDirection: "row", marginBottom: 18 },
+  header: { flexDirection: "row", marginBottom: 18, height: 82 },
   logoBox: {
     width: 90,
-    backgroundColor: NAVY,
+    // sem cor de fundo — a imagem já tem fundo navy
     alignItems: "center",
     justifyContent: "center",
-    padding: 8,
   },
-  logoImg:      { width: 58, height: 58, objectFit: "contain" },
-  logoDecorTxt: { color: "rgba(255,255,255,0.7)", fontSize: 7, letterSpacing: 2, marginTop: 3 },
+  logoImg:      { width: 90, height: 82, objectFit: "cover" },
+  logoDecorTxt: { color: "rgba(255,255,255,0.7)", fontSize: 7, letterSpacing: 2, position: "absolute", bottom: 6 },
   titleBox: {
     flex: 1,
     backgroundColor: CORAL,
@@ -244,13 +243,18 @@ export function MemorialDocument({ data }: { data: MemorialData }) {
             (sum, i) => sum + i.valorUnitario * i.quantidade, 0
           );
           return (
-            <View key={grupo.nome} wrap={false}>
-              <View style={s.groupHeader}>
-                <Text style={s.groupName}>{grupo.nome}</Text>
-                {grupoTotal > 0 && <Text style={s.groupTotal}>{fmt(grupoTotal)}</Text>}
+            <View key={grupo.nome}>
+              {/* Header colado ao primeiro item para não ficar órfão no topo da página */}
+              <View wrap={false}>
+                <View style={s.groupHeader}>
+                  <Text style={s.groupName}>{grupo.nome}</Text>
+                  {grupoTotal > 0 && <Text style={s.groupTotal}>{fmt(grupoTotal)}</Text>}
+                </View>
+                {grupo.items[0] && <ProductRow item={grupo.items[0]} idx={0} />}
               </View>
-              {grupo.items.map((item, idx) => (
-                <ProductRow key={idx} item={item} idx={idx} />
+              {/* Demais itens fluem normalmente entre páginas */}
+              {grupo.items.slice(1).map((item, idx) => (
+                <ProductRow key={idx + 1} item={item} idx={idx + 1} />
               ))}
             </View>
           );
