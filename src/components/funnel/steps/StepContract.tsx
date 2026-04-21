@@ -18,24 +18,6 @@ function fmt(v: number) {
   return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-function playSuccessBeep() {
-  try {
-    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const gain = ctx.createGain();
-    gain.connect(ctx.destination);
-
-    [[600, 0, 0.12], [900, 0.13, 0.12], [1200, 0.27, 0.2]].forEach(([freq, start, dur]) => {
-      const osc = ctx.createOscillator();
-      osc.connect(gain);
-      osc.type = "sine";
-      osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.25, ctx.currentTime + start);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + dur);
-      osc.start(ctx.currentTime + start);
-      osc.stop(ctx.currentTime + start + dur);
-    });
-  } catch { /* browser may block audio without user interaction */ }
-}
 
 export function StepContract() {
   const {
@@ -75,7 +57,6 @@ export function StepContract() {
     }
     setSending(false);
     setSent(true);
-    playSuccessBeep();
   };
 
   // ── Success screen ────────────────────────────────────────────────────────
