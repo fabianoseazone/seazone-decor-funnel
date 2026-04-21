@@ -318,11 +318,8 @@ function PackageCard({ tip, isSelected, isRecommended, onSelect }: {
   const totalPrice = useMemo(() => {
     if (!produtosPadrao.length) return null;
     const subtotal = produtosPadrao.reduce((sum, p) => sum + (p.valor_unitario ?? 0) * (p.quantidade ?? 1), 0);
-    const decorValor = tip.decor_valor ?? 0;
-    const admPercent = (tip.adm_percent ?? 0) / 100;
-    const orcamento = subtotal + (decorValor + admPercent * subtotal) * 1.1433;
-    return calcTotalContrato(orcamento);
-  }, [produtosPadrao, tip.decor_valor, tip.adm_percent]);
+    return calcTotalContrato(subtotal);
+  }, [produtosPadrao]);
 
   // Preload w120 thumbnails as soon as card data arrives
   useEffect(() => {

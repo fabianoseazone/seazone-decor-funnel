@@ -264,11 +264,7 @@ export function StepCustomization() {
 
   useEffect(() => { setSubtotalProdutos(subtotal); }, [subtotal, setSubtotalProdutos]);
 
-  const decorValor = tipologiaSelecionada?.decor_valor ?? 0;
-  const admPercent = (tipologiaSelecionada?.adm_percent ?? 0) / 100;
-  const seazoneBilling = decorValor + admPercent * subtotal;
-  const orcamento = subtotal + seazoneBilling * 1.1433;
-  const total = calcTotalContrato(orcamento);
+  const total = calcTotalContrato(subtotal);
 
   const openSwap = useCallback((item: ProdutoTipologia) => {
     setSelectedItem(item);

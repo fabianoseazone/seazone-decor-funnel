@@ -170,12 +170,8 @@ export function FunnelProvider({ children }: { children: ReactNode }) {
   }, [customizations]);
 
   const getTotalPrice = useCallback(() => {
-    const decorValor = tipologiaSelecionada?.decor_valor ?? 0;
-    const admPercent = (tipologiaSelecionada?.adm_percent ?? 0) / 100;
-    // Seazone billing = operational costs + 6% adm tax → subject to 14.33% service tax
-    const seazoneBilling = decorValor + admPercent * subtotalProdutos;
-    return subtotalProdutos + seazoneBilling * 1.1433;
-  }, [subtotalProdutos, tipologiaSelecionada]);
+    return subtotalProdutos;
+  }, [subtotalProdutos]);
 
   const canProceed = useCallback((): boolean => {
     switch (currentStep) {

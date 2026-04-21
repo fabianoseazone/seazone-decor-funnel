@@ -4,6 +4,7 @@ import { Download, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useFunnel } from "@/contexts/FunnelContext";
 import { useProdutosTipologia } from "@/hooks/useProdutosTipologia";
+import { calcTotalContrato } from "@/data/servicosDecor";
 import { MemorialDocument } from "./MemorialPDF";
 import type { MemorialData } from "./MemorialPDF";
 import { toast } from "sonner";
@@ -103,12 +104,7 @@ export function DownloadMemorialButton({ variant = "glass" }: { variant?: string
         })
       );
 
-      const decorValor = tipologiaSelecionada?.decor_valor ?? 0;
-      const admPct = tipologiaSelecionada?.adm_percent ?? 0;
-      const admValor = (admPct / 100) * subtotalProdutos;
-      const seazoneBilling = decorValor + admValor;
-      const impostoValor = seazoneBilling * 0.1433;
-      const total = subtotalProdutos + seazoneBilling + impostoValor;
+      const total = calcTotalContrato(subtotalProdutos);
 
       const isPersonalizado = swaps.size > 0 || removidos.size > 0;
 

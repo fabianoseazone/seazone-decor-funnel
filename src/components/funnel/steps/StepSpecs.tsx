@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useFunnel } from "@/contexts/FunnelContext";
 import { useProdutosTipologia } from "@/hooks/useProdutosTipologia";
+import { calcTotalContrato } from "@/data/servicosDecor";
 import type { ProdutoTipologia } from "@/types/catalog";
 
 const SUBCATEGORIA_NOME: Record<string, string> = {
@@ -98,12 +99,7 @@ export function StepSpecs() {
   const subtotalProdutos = allItems.reduce(
     (sum, p) => sum + (p.valor_unitario ?? 0) * (p.quantidade ?? 1), 0
   );
-  const decorValor = tipologiaSelecionada?.decor_valor ?? 0;
-  const admPercent = (tipologiaSelecionada?.adm_percent ?? 0) / 100;
-  const admValor = admPercent * subtotalProdutos;
-  const seazoneBilling = decorValor + admValor;
-  const impostoValor = seazoneBilling * 0.1433;
-  const total = subtotalProdutos + seazoneBilling + impostoValor;
+  const total = calcTotalContrato(subtotalProdutos);
   const parcela = total / 15;
 
   const isPersonalizado = swaps.size > 0 || removidos.size > 0;
