@@ -108,6 +108,7 @@ export function DownloadMemorialButton({ variant = "glass" }: { variant?: string
         })
       );
 
+      const logoBase64 = await fetchBase64(`${window.location.origin}/logo-seazone.png`);
       const total = calcTotalContrato(subtotalProdutos);
       const isPersonalizado = swaps.size > 0 || removidos.size > 0 || adicionados.size > 0;
 
@@ -135,6 +136,7 @@ export function DownloadMemorialButton({ variant = "glass" }: { variant?: string
         })),
         total,
         isPersonalizado,
+        logoBase64,
       };
 
       const blob = await pdf(<MemorialDocument data={data} />).toBlob();

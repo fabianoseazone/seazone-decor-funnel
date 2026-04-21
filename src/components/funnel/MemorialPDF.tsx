@@ -36,6 +36,7 @@ export interface MemorialData {
   grupos: MemorialGrupo[];
   total: number;
   isPersonalizado: boolean;
+  logoBase64: string | null;
 }
 
 const s = StyleSheet.create({
@@ -52,14 +53,13 @@ const s = StyleSheet.create({
   // ── Header ──────────────────────────────────────
   header: { flexDirection: "row", marginBottom: 18 },
   logoBox: {
-    width: 72,
+    width: 90,
     backgroundColor: NAVY,
     alignItems: "center",
     justifyContent: "center",
     padding: 10,
   },
-  logoText: { color: "white", fontFamily: "Helvetica-Bold", fontSize: 18, letterSpacing: 2 },
-  logoSub:  { color: "rgba(255,255,255,0.45)", fontSize: 6, letterSpacing: 1, marginTop: 2 },
+  logoImg: { width: 60, height: 60, objectFit: "contain" },
   titleBox: {
     flex: 1,
     backgroundColor: CORAL,
@@ -213,8 +213,10 @@ export function MemorialDocument({ data }: { data: MemorialData }) {
         {/* ── Header ── */}
         <View style={s.header}>
           <View style={s.logoBox}>
-            <Text style={s.logoText}>SZ</Text>
-            <Text style={s.logoSub}>DECOR</Text>
+            {data.logoBase64
+              ? <Image src={data.logoBase64} style={s.logoImg} />
+              : <Text style={{ color: "white", fontFamily: "Helvetica-Bold", fontSize: 18 }}>SZ</Text>
+            }
           </View>
           <View style={s.titleBox}>
             <Text style={s.titleText}>MEMORIAL DESCRITIVO POR TIPOLOGIA</Text>
@@ -238,16 +240,8 @@ export function MemorialDocument({ data }: { data: MemorialData }) {
             <Text style={s.iLabel2}>Pacote</Text>
             <Text style={s.iValue2}>{data.pacote || "—"}</Text>
           </View>
-          <InfoRow label="Data de geração" value={data.dataGeracao} last />
-        </View>
-
-        {/* ── Total only ── */}
-        <View style={s.totalBox}>
-          <View style={s.totalLeft}>
-            <Text style={s.totalLabel}>TOTAL ESTIMADO</Text>
-            <Text style={s.totalParcela}>15x de {fmt(data.total / 15)}</Text>
-          </View>
-          <Text style={s.totalValue}>{fmt(data.total)}</Text>
+          <InfoRow label="Data de geração" value={data.dataGeracao} />
+          <InfoRow label="Valor Total"     value={fmt(data.total)} last />
         </View>
 
         {/* ── Product groups ── */}
