@@ -84,7 +84,7 @@ export function UnitSelector({ onComplete }: UnitSelectorProps) {
           <div className="grid md:grid-cols-2 gap-4">
             <div
               className="group cursor-pointer rounded-2xl border border-white/10 bg-white/5 hover:bg-white/8 hover:border-seazone-coral/40 transition-all duration-300 p-8 text-center space-y-5"
-              onClick={() => setMode("owner-login")}
+              onClick={() => window.location.href = "https://dash-decor.seazone.com.br/login"}
             >
               <div className="w-16 h-16 mx-auto rounded-2xl bg-seazone-coral/15 border border-seazone-coral/20 flex items-center justify-center group-hover:bg-seazone-coral/20 transition-colors">
                 <Building2 className="w-8 h-8 text-seazone-coral" />
