@@ -7,6 +7,8 @@ import { useFunnel } from "@/contexts/FunnelContext";
 import { supabase } from "@/integrations/supabase/client";
 import { DownloadMemorialButton } from "@/components/funnel/DownloadMemorialButton";
 import { SERVICOS, TOTAL_SERVICOS, calcTotalContrato } from "@/data/servicosDecor";
+import { useProdutosTipologia } from "@/hooks/useProdutosTipologia";
+import { buildMemorialBlob } from "@/lib/buildMemorial";
 
 const PACOTE_LABEL: Record<string, string> = {
   essential: "Essential",
@@ -37,6 +39,9 @@ export function StepContract() {
   const [sent, setSent] = useState(false);
   const [showBreakdown, setShowBreakdown] = useState(false);
 
+  const tipologiaCodigo = tipologiaSelecionada?.codigo ?? null;
+  const { produtosPadrao, produtosAdicionais } = useProdutosTipologia(tipologiaCodigo);
+
   const orcamento    = getTotalPrice();
   const taxaAdm      = orcamento * 0.06;
   const total        = calcTotalContrato(orcamento);
@@ -50,7 +55,7 @@ export function StepContract() {
   const handleSolicitar = async () => {
     setSending(true);
     try {
-      await supabase.from("simulator_leads").insert({
+      const { data: inserted } = await supabase.from("simulator_leads").insert({
         name: ownerName || "Proprietário",
         phone: null,
         email: null,
@@ -58,7 +63,26 @@ export function StepContract() {
         total_price: total,
         units: selectedUnit?.id ?? null,
         investor_profile: `cpf:${ownerCpf}|unit:${selectedUnit?.id}|emp:${selectedUnit?.spot}`,
-      });
+      }).select("id").single();
+
+      // Gera e sobe o memorial em background sem bloquear o fluxo
+      if (inserted?.id) {
+        buildMemorialBlob({
+          selectedUnit, tipologiaSelecionada, produtosPadrao, produtosAdicionais,
+          removidos, adicionados, swaps, subtotalProdutos: getTotalPrice(),
+        }).then(async ({ blob, filename }) => {
+          const path = `${inserted.id}/${filename}`;
+          const { error: uploadError } = await supabase.storage
+            .from("memoriais")
+            .upload(path, blob, { contentType: "application/pdf", upsert: true });
+          if (!uploadError) {
+            const { data: urlData } = supabase.storage.from("memoriais").getPublicUrl(path);
+            await supabase.from("simulator_leads")
+              .update({ memorial_url: urlData.publicUrl })
+              .eq("id", inserted.id);
+          }
+        }).catch(() => {});
+      }
     } catch {
       // silently ignore - show success anyway
     }
